@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upper GI Disorders — Week 12 Quiz</title>
+<style>
+  :root {
+    --primary: #1E2761;
+    --accent: #CADCFC;
+    --good: #2C7A3F;
+    --bad: #B03A2E;
+    --bg: #F7F8FC;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    background: var(--bg);
+    color: #1a1a1a;
+    padding: 24px 16px 80px;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  header {
+    background: var(--primary);
+    color: white;
+    border-radius: 12px;
+    padding: 28px 24px;
+    margin-bottom: 24px;
+  }
+  header h1 { margin: 0 0 6px; font-size: 1.5rem; }
+  header p { margin: 0; opacity: 0.85; font-size: 0.95rem; }
+
+  #progress-bar-track {
+    background: rgba(255,255,255,0.25);
+    height: 8px;
+    border-radius: 4px;
+    margin-top: 18px;
+    overflow: hidden;
+  }
+  #progress-bar-fill {
+    background: var(--accent);
+    height: 100%;
+    width: 0%;
+    transition: width 0.25s ease;
+  }
+  #progress-text { font-size: 0.8rem; margin-top: 6px; opacity: 0.85; }
+
+  .card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px 22px;
+    margin-bottom: 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .card .section-tag {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--primary);
+    background: var(--accent);
+    padding: 3px 9px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+  }
+  .card .qnum { font-weight: 700; color: var(--primary); margin-right: 6px; }
+  .card .qtext { font-size: 1.02rem; line-height: 1.4; margin-bottom: 14px; }
+
+  .opt {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 8px 10px 12px;
+    border: 1.5px solid #e2e4ec;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    transition: border-color 0.15s, background 0.15s;
+    font-size: 0.95rem;
+    line-height: 1.35;
+  }
+  .opt-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    flex: 1;
+    cursor: pointer;
+    min-width: 0;
+  }
+  .opt:hover { border-color: var(--primary); background: #fafbff; }
+  .opt.selected { border-color: var(--primary); background: var(--accent); }
+  .opt.correct { border-color: var(--good); background: #eaf6ec; }
+  .opt.incorrect { border-color: var(--bad); background: #fbeceb; }
+  .opt .letter {
+    font-weight: 700;
+    min-width: 20px;
+    color: var(--primary);
+  }
+  .opt.disabled .opt-content { cursor: default; }
+  .opt.struck .opt-content { text-decoration: line-through; opacity: 0.42; }
+  .opt.struck { background: #f7f7f9; }
+
+  .strike-btn {
+    flex-shrink: 0;
+    background: none;
+    border: 1px solid #e2e4ec;
+    color: #9aa0b8;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 5px 9px;
+    border-radius: 6px;
+    cursor: pointer;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .strike-btn:hover { border-color: var(--primary); color: var(--primary); }
+  .strike-btn.active { border-color: var(--bad); color: var(--bad); background: #fdf1f0; }
+  .strike-btn:disabled, .strike-btn.hidden { visibility: hidden; }
+
+  .card-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 6px;
+  }
+  .check-btn {
+    background: white;
+    color: var(--primary);
+    border: 1.5px solid var(--primary);
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 7px 16px;
+    border-radius: 7px;
+    cursor: pointer;
+  }
+  .check-btn:disabled {
+    border-color: #d3d6e2;
+    color: #a7abbf;
+    cursor: not-allowed;
+  }
+  .check-btn.checked {
+    background: #eef0f8;
+    border-color: #d3d6e2;
+    color: #7d81a0;
+  }
+
+  .feedback {
+    margin-top: 12px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    line-height: 1.45;
+    display: none;
+  }
+  .feedback.show { display: block; }
+  .feedback .verdict { font-weight: 700; display: block; margin-bottom: 4px; }
+  .feedback.correct { background: #eaf6ec; color: #1e5c2c; }
+  .feedback.correct .verdict { color: var(--good); }
+  .feedback.incorrect { background: #fbeceb; color: #7a2a20; }
+  .feedback.incorrect .verdict { color: var(--bad); }
+
+  #submit-bar {
+    position: sticky;
+    bottom: 0;
+    background: var(--bg);
+    padding: 14px 0 4px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+  }
+  button {
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 12px 28px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+  }
+  #grade-btn { background: var(--primary); color: white; }
+  #grade-btn:disabled { background: #aab0c9; cursor: not-allowed; }
+  #reset-btn { background: white; color: var(--primary); border: 1.5px solid var(--primary); }
+
+  #results {
+    display: none;
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  #results h2 { margin: 0 0 4px; color: var(--primary); font-size: 2rem; }
+  #results p { margin: 4px 0; color: #444; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Upper GI Disorders — Week 12 Quiz</h1>
+    <p>50 first-order review questions · PAS-523 Clinical Medicine II</p>
+    <div id="progress-bar-track"><div id="progress-bar-fill"></div></div>
+    <div id="progress-text">0 / 50 answered</div>
+  </header>
+
+  <div id="results">
+    <h2 id="score-display">0 / 50</h2>
+    <p id="score-msg"></p>
+  </div>
+
+  <div id="quiz-container"></div>
+
+  <div id="submit-bar">
+    <button id="grade-btn" disabled>Grade Quiz</button>
+    <button id="reset-btn">Reset</button>
+  </div>
+</div>
+
+<script>
+const QUESTIONS = [{"num":1,"section":"Esophageal Anatomy & Physiology","q":"How long is the esophagus, and between which two structures does it run?","opts":["~10 cm, mouth to stomach","~25 cm, upper esophageal sphincter to gastric cardia","~40 cm, pharynx to duodenum","~15 cm, UES to LES only"],"a":1,"ex":"The esophagus runs about 25 cm from the upper esophageal sphincter (UES) to the gastric cardia."},{"num":2,"section":"Esophageal Anatomy & Physiology","q":"What type of epithelium lines the esophagus?","opts":["Simple columnar","Nonkeratinized stratified squamous","Simple cuboidal","Transitional epithelium"],"a":1,"ex":"Nonkeratinized stratified squamous epithelium — tough, abrasion-resistant tissue built for passing food, not absorbing nutrients."},{"num":3,"section":"Esophageal Anatomy & Physiology","q":"Why is the absence of a serosal layer on the esophagus clinically significant?","opts":["It increases risk of GERD","It allows perforation to spread into the mediastinum quickly and become severe","It prevents peristalsis","It directly causes Barrett's esophagus"],"a":1,"ex":"With no serosa, a perforation (as in Boerhaave's syndrome) can spread into the mediastinum quickly, making it clinically severe."},{"num":4,"section":"Esophageal Anatomy & Physiology","q":"Which neurotransmitters mediate the inhibitory (relaxing) signal in normal esophageal motility?","opts":["Acetylcholine (ACh) only","Nitric oxide (NO) and VIP","Dopamine","Substance P"],"a":1,"ex":"Myenteric neurons release NO and VIP to inhibit/relax muscle, while cholinergic (ACh) neurons are excitatory."},{"num":5,"section":"Esophageal Anatomy & Physiology","q":"What three components make up the anti-reflux barrier?","opts":["UES, pharynx, epiglottis","LES pressure, the crural diaphragm, and the intra-abdominal esophageal segment","Gastric acid, pepsin, and bile","Peristalsis, saliva, and mucus"],"a":1,"ex":"The anti-reflux barrier depends on LES pressure, the crural diaphragm (which pinches the esophagus), and the intra-abdominal esophageal segment."},{"num":6,"section":"Dysphagia Work-Up","q":"Oropharyngeal dysphagia is characterized by:","opts":["Food sticking after swallowing begins normally","Difficulty initiating a swallow, with coughing/choking or nasal regurgitation","Progressive dysphagia to solids only","Episodic chest pain triggered by hot/cold liquids"],"a":1,"ex":"Oropharyngeal dysphagia involves trouble initiating the swallow itself — coughing, choking, nasal regurgitation, a wet/gurgling voice — usually from neurologic or neuromuscular disease."},{"num":7,"section":"Dysphagia Work-Up","q":"Progressive dysphagia to solids only most suggests:","opts":["Achalasia","A structural/mechanical cause (stricture, ring, EoE, or malignancy)","Diffuse esophageal spasm","Functional dysphagia"],"a":1,"ex":"Solids-only, progressive dysphagia points toward a structural/mechanical narrowing rather than a motility disorder."},{"num":8,"section":"Dysphagia Work-Up","q":"Dysphagia to both solids AND liquids most suggests:","opts":["A Schatzki ring","A peptic stricture","A motility disorder","Malignancy"],"a":2,"ex":"Dysphagia to both solids and liquids is the classic tell for a motility disorder such as achalasia or diffuse esophageal spasm."},{"num":9,"section":"Dysphagia Work-Up","q":"Per current ASGE guidance, GERD plus which finding mandates an EGD?","opts":["Mild heartburn only, well-controlled","Occasional regurgitation after large meals","Unexplained iron-deficiency anemia","Symptoms only triggered by coffee"],"a":2,"ex":"GERD plus dysphagia, odynophagia, weight loss, bleeding, vomiting, or unexplained iron-deficiency anemia should prompt an EGD."},{"num":10,"section":"Dysphagia Work-Up","q":"Which diagnostic test best evaluates esophageal motor function?","opts":["Barium esophagram","Esophageal manometry","Ambulatory pH monitoring","Abdominal ultrasound"],"a":1,"ex":"Esophageal manometry directly assesses esophageal motor function and is used to diagnose achalasia and other motility disorders."},{"num":11,"section":"Dysphagia Work-Up","q":"In the dysphagia diagnostic pathway, if EGD does not explain the dysphagia, what's the next step?","opts":["Repeat the EGD immediately","Esophageal manometry","Start an empiric PPI trial and stop the work-up","CT chest without further testing"],"a":1,"ex":"If EGD doesn't explain the dysphagia, the next step is esophageal manometry to look for a motility disorder."},{"num":12,"section":"GERD & Barrett's Esophagus","q":"GERD is best defined as:","opts":["Any single episode of heartburn","Reflux of gastric contents producing troublesome symptoms","Chronic vomiting of unknown cause","Esophageal motility failure"],"a":1,"ex":"GERD is reflux of gastric contents that produces troublesome symptoms — common phenotypes include non-erosive reflux, erosive esophagitis, and Barrett's esophagus."},{"num":13,"section":"GERD & Barrett's Esophagus","q":"Which of the following lowers LES tone and can worsen GERD?","opts":["Metoclopramide","Coffee, tobacco, alcohol, CCBs, and nitrates","Antacids","Beta blockers used for hypertension"],"a":1,"ex":"Coffee, tobacco, alcohol, calcium channel blockers, and nitrates all lower LES tone and worsen reflux."},{"num":14,"section":"GERD & Barrett's Esophagus","q":"A patient with classic GERD symptoms and no alarm features should initially be treated with:","opts":["Immediate EGD","Empiric once-daily PPI for 8 weeks","H. pylori quadruple therapy","Esophageal manometry"],"a":1,"ex":"Classic symptoms without alarm features warrant an empiric once-daily PPI trial for 8 weeks before further work-up."},{"num":15,"section":"GERD & Barrett's Esophagus","q":"Which of the following is a recognized long-term risk of PPI therapy?","opts":["Hyperkalemia","Hypomagnesemia","Increased bone density","Increased vitamin B12 absorption"],"a":1,"ex":"Long-term PPI risks include hypomagnesemia, decreased B12 absorption, and decreased bone density."},{"num":16,"section":"GERD & Barrett's Esophagus","q":"What is the correct progression sequence in Barrett's esophagus?","opts":["Dysplasia → metaplasia → adenocarcinoma","Intestinal metaplasia → low-grade dysplasia → high-grade dysplasia → adenocarcinoma","Erosive esophagitis → metaplasia → ulcer only","Squamous metaplasia → columnar dysplasia"],"a":1,"ex":"Barrett's progresses: intestinal metaplasia → low-grade dysplasia → high-grade dysplasia → intramucosal adenocarcinoma → invasive adenocarcinoma."},{"num":17,"section":"GERD & Barrett's Esophagus","q":"Which population should be screened for Barrett's esophagus?","opts":["Young women with occasional heartburn","Male, >50 years old, White, tobacco use, obesity, or a first-degree relative with Barrett's/esophageal cancer, with chronic GERD","Anyone with a single reflux episode","Patients on long-term antibiotics"],"a":1,"ex":"High-risk screening population: male, over 50, White, tobacco use, obesity, or a first-degree relative with Barrett's/esophageal malignancy, with chronic GERD."},{"num":18,"section":"GERD & Barrett's Esophagus","q":"How is nondysplastic Barrett's esophagus with a segment <3 cm managed?","opts":["Immediate esophagectomy","Daily PPI with surveillance EGD every 5 years","Endoscopic resection every year regardless of size","No follow-up needed once diagnosed"],"a":1,"ex":"Nondysplastic Barrett's: daily PPI, with surveillance EGD every 5 years if <3 cm (every 3 years if >3 cm)."},{"num":19,"section":"GERD & Barrett's Esophagus","q":"What do Los Angeles (LA) Grades A–D describe, and what do grades C–D indicate?","opts":["Barrett's dysplasia grade; C–D = cancer","The severity of erosive (reflux) esophagitis; C–D = severe mucosal injury","Achalasia severity; C–D = surgical candidacy","H. pylori resistance patterns"],"a":1,"ex":"LA Grades A–D describe endoscopic severity of reflux esophagitis; grades C–D indicate severe mucosal injury requiring long-term maintenance PPI."},{"num":20,"section":"Esophagitis & Strictures","q":"Which symptom suggests mucosal injury rather than simple reflux?","opts":["Heartburn","Odynophagia","Regurgitation","Bloating"],"a":1,"ex":"Odynophagia (pain with swallowing) suggests mucosal injury, whereas heartburn simply suggests reflux."},{"num":21,"section":"Esophagitis & Strictures","q":"What is the pathophysiology of pill-induced esophagitis?","opts":["Eosinophilic infiltration of the mucosa","A tablet lodges at an anatomic narrowing, causing direct prolonged mucosal contact and injury","Viral infection of the esophageal mucosa","Autoimmune destruction of the epithelium"],"a":1,"ex":"A tablet lodges at a natural anatomic narrowing, and prolonged mucosal contact causes direct injury."},{"num":22,"section":"Esophagitis & Strictures","q":"Which medication is classically associated with pill-induced esophagitis?","opts":["Acetaminophen","Bisphosphonates","Metformin","Statins"],"a":1,"ex":"Common culprits include tetracyclines, bisphosphonates, potassium chloride tablets, iron supplements, NSAIDs, and clindamycin."},{"num":23,"section":"Esophagitis & Strictures","q":"White adherent plaques on EGD (+/- oral thrush) suggest which infection, and what is first-line treatment?","opts":["HSV; acyclovir","CMV; ganciclovir","Candida; PO fluconazole","Bacterial infection; ceftriaxone"],"a":2,"ex":"White adherent plaques with +/- oral thrush are classic for Candida esophagitis, treated with PO fluconazole."},{"num":24,"section":"Esophagitis & Strictures","q":"What is the pathophysiology of eosinophilic esophagitis (EoE)?","opts":["Acid reflux causing squamous metaplasia","A Th2-mediated immune response (IL-4/5/13) driving eosinophil recruitment, epithelial injury, and fibrosis","H. pylori infection of the esophagus","Autonomic denervation of the myenteric plexus"],"a":1,"ex":"EoE is a chronic, antigen-driven immune disease: Th2 activation → IL-4/5/13 → eosinophil recruitment → epithelial injury → fibroblast activation → rings/strictures."},{"num":25,"section":"Esophagitis & Strictures","q":"Adults with EoE classically present with:","opts":["Poor growth and feeding difficulty","Dysphagia and food impaction","Nocturnal cough only","Painless jaundice"],"a":1,"ex":"Adults with EoE present with dysphagia and food impaction; children present with feeding difficulty, vomiting, abdominal pain, and poor growth."},{"num":26,"section":"Esophagitis & Strictures","q":"What is the underlying process that causes esophageal strictures to form?","opts":["Sudden vascular occlusion of the esophagus","Persistent epithelial injury → inflammation → fibroblast activation → collagen remodeling → progressive luminal narrowing","Eosinophil-independent fibrosis with no clear trigger","Acute viral infection of the muscularis"],"a":1,"ex":"Strictures form when persistent epithelial injury drives inflammation, fibroblast activation, and collagen remodeling that progressively narrows the lumen."},{"num":27,"section":"Esophagitis & Strictures","q":"A thin, circumferential mucosal ring causing intermittent solid dysphagia (\"steakhouse syndrome\") describes:","opts":["An esophageal web","A Schatzki ring","A Zenker diverticulum","Barrett's esophagus"],"a":1,"ex":"A Schatzki ring is a thin circumferential mucosal ring, sometimes associated with reflux/EoE, causing intermittent solid dysphagia — \"steakhouse syndrome.\""},{"num":28,"section":"Esophageal Motility Disorders","q":"What is the underlying pathophysiology of achalasia?","opts":["Excess nitric oxide release from the myenteric plexus","Degeneration of inhibitory myenteric neurons, causing loss of NO and unopposed cholinergic activity","Autoimmune destruction of the LES muscle fibers","Excess VIP release causing LES over-relaxation"],"a":1,"ex":"In achalasia, inhibitory (NO-releasing) neurons degenerate, leaving unopposed cholinergic activity and incomplete LES relaxation."},{"num":29,"section":"Esophageal Motility Disorders","q":"What is the gold-standard test for diagnosing achalasia?","opts":["Barium swallow","High-resolution manometry","CT chest","Ambulatory pH monitoring"],"a":1,"ex":"High-resolution manometry is the gold standard for achalasia, though barium swallow and EGD (to exclude pseudoachalasia) also play a role."},{"num":30,"section":"Esophageal Motility Disorders","q":"What classic finding is seen on barium swallow in achalasia?","opts":["A \"corkscrew\" appearance","A dilated proximal esophagus with \"bird beak\" narrowing at the LES","Obstruction at a \"steakhouse\" ring","A Zenker pouch at the pharyngoesophageal junction"],"a":1,"ex":"Barium swallow in achalasia classically shows a dilated esophagus with \"bird beak\" narrowing at the LES."},{"num":31,"section":"Esophageal Motility Disorders","q":"What is the key manometric difference between achalasia and diffuse esophageal spasm (DES)?","opts":["Achalasia has normal LES relaxation; DES has impaired LES relaxation","Achalasia has impaired LES relaxation; DES has preserved LES relaxation","Both disorders show impaired LES relaxation","Neither disorder affects LES relaxation"],"a":1,"ex":"Achalasia = impaired LES relaxation. DES = preserved (normal) LES relaxation with premature contractions — the key distinguishing feature."},{"num":32,"section":"Esophageal Motility Disorders","q":"A \"corkscrew\" appearance on barium swallow with episodic chest pain triggered by very hot or cold liquids is classic for:","opts":["Achalasia","Diffuse esophageal spasm","Zenker diverticulum","Eosinophilic esophagitis"],"a":1,"ex":"Diffuse esophageal spasm classically shows a corkscrew appearance on barium swallow, with episodic chest pain sometimes triggered by temperature extremes."},{"num":33,"section":"Esophageal Motility Disorders","q":"Which motility disorder is treated based on symptoms rather than manometry numbers, due to excessively vigorous contractions?","opts":["Ineffective esophageal motility","Hypercontractile esophagus","Achalasia","Pseudoachalasia"],"a":1,"ex":"Hypercontractile esophagus involves excessive, vigorous contractions; treatment is guided by symptoms rather than chasing the manometry values."},{"num":34,"section":"Esophageal Motility Disorders","q":"Rapid symptom progression, marked weight loss, and older age in a patient with achalasia-like symptoms should raise suspicion for:","opts":["Diffuse esophageal spasm","Pseudoachalasia from a secondary obstruction (e.g., malignancy)","A Zenker diverticulum","Eosinophilic esophagitis"],"a":1,"ex":"This combination should prompt work-up for pseudoachalasia — achalasia-like symptoms from a secondary cause such as tumor, malignancy, or neurologic injury."},{"num":35,"section":"Zenker Diverticulum","q":"A Zenker diverticulum forms through which anatomic structure?","opts":["The angle of His","Killian's triangle","The ampulla of Vater","The ligament of Treitz"],"a":1,"ex":"Zenker diverticulum forms through Killian's triangle due to cricopharyngeal dysfunction."},{"num":36,"section":"Zenker Diverticulum","q":"Which symptom cluster is classic for Zenker diverticulum?","opts":["Heartburn, regurgitation, and weight loss","Oropharyngeal dysphagia, regurgitation of undigested food, and halitosis","Chest pain and dysphagia to solids and liquids","Odynophagia, fever, and oral thrush"],"a":1,"ex":"Zenker diverticulum presents with oropharyngeal dysphagia, regurgitation of undigested food, halitosis, and coughing after meals."},{"num":37,"section":"Zenker Diverticulum","q":"What is the treatment for Zenker diverticulum?","opts":["PPI therapy alone","Cricopharyngeal myotomy","Heller myotomy","Nissen fundoplication"],"a":1,"ex":"Zenker diverticulum is diagnosed with a barium swallow and treated with cricopharyngeal myotomy."},{"num":38,"section":"Upper GI Bleeding & Esophageal Bleeding Disorders","q":"Upper GI bleeding is defined as bleeding located:","opts":["Distal to the ligament of Treitz","Proximal to the ligament of Treitz","Only within the stomach","Only within the esophagus"],"a":1,"ex":"Upper GI bleeding is bleeding proximal to the ligament of Treitz (esophagus, stomach, or duodenum)."},{"num":39,"section":"Upper GI Bleeding & Esophageal Bleeding Disorders","q":"Which lab finding supports an upper GI (rather than lower GI) source of bleeding?","opts":["An elevated BUN-to-creatinine ratio","A low hemoglobin alone","An elevated lipase","An elevated ALT"],"a":0,"ex":"An elevated BUN-to-creatinine ratio (from digested blood being absorbed as protein) supports an upper GI source."},{"num":40,"section":"Upper GI Bleeding & Esophageal Bleeding Disorders","q":"In upper GI bleeding, what hemoglobin threshold typically triggers transfusion in a stable patient?","opts":["10 g/dL","7 g/dL","5 g/dL","9 g/dL"],"a":1,"ex":"A hemoglobin threshold of 7 g/dL is used for most patients (8 g/dL if actively bleeding)."},{"num":41,"section":"Upper GI Bleeding & Esophageal Bleeding Disorders","q":"What causes a Mallory-Weiss tear?","opts":["Chronic acid reflux over years","A sudden rise in intragastric pressure during retching/vomiting, causing a mucosal laceration near the GE junction","H. pylori infection","Long-term NSAID use"],"a":1,"ex":"A Mallory-Weiss tear is a longitudinal mucosal laceration near the GE junction from a sudden rise in intragastric pressure during retching/vomiting."},{"num":42,"section":"Upper GI Bleeding & Esophageal Bleeding Disorders","q":"Boerhaave's syndrome is best described as:","opts":["A partial-thickness mucosal tear","A full-thickness esophageal tear/perforation — a GI emergency","A benign, self-limited condition","An eosinophil-mediated stricture"],"a":1,"ex":"Boerhaave's syndrome is a full-thickness tear with esophageal perforation, presenting with chest pain, mediastinitis, and systemic symptoms — a true GI emergency."},{"num":43,"section":"Upper GI Bleeding & Esophageal Bleeding Disorders","q":"What is the pathophysiology of esophageal varices?","opts":["H. pylori infection of gastric veins","Cirrhosis → portal hypertension → enlarged distal esophageal veins at risk of rupture","NSAID-induced vascular injury","Autoimmune vasculitis"],"a":1,"ex":"Cirrhosis causes resistance to portal flow, leading to portal hypertension and enlargement of distal esophageal veins, which carry a rupture risk."},{"num":44,"section":"Upper GI Bleeding & Esophageal Bleeding Disorders","q":"What is used for primary prophylaxis against variceal bleeding, and what reduces portal hypertension during an acute bleed?","opts":["PPI for prophylaxis; antibiotics for acute bleeds","Nonselective beta blockers for prophylaxis; octreotide for acute bleeds","NSAIDs for prophylaxis; bismuth for acute bleeds","Antibiotics for prophylaxis; tetracycline for acute bleeds"],"a":1,"ex":"Nonselective beta blockers (propranolol, nadolol, carvedilol) are used for primary prophylaxis; octreotide reduces portal hypertension during an acute variceal bleed."},{"num":45,"section":"Peptic Ulcer Disease","q":"Peptic ulcer disease is best defined as:","opts":["Inflammation of the esophageal mucosa only","A mucosal break in the stomach or duodenum due to acid injury","A motility disorder of the stomach","An autoimmune condition of the pancreas"],"a":1,"ex":"PUD is a mucosal break in the stomach or duodenum due to acid injury, most often from H. pylori or NSAIDs."},{"num":46,"section":"Peptic Ulcer Disease","q":"How does H. pylori survive in the acidic gastric environment?","opts":["It produces urease, converting urea into ammonia to create a less acidic microenvironment","It produces excess mucus to coat itself","It secretes bicarbonate directly into the lumen","It relies solely on a thick cell wall for acid resistance"],"a":0,"ex":"H. pylori produces urease, which converts urea into ammonia, creating a less acidic microenvironment, and it attaches to gastric epithelial cells."},{"num":47,"section":"Peptic Ulcer Disease","q":"Before testing for H. pylori with a urea breath test or stool antigen test, what must be done?","opts":["Start a PPI immediately beforehand","Stop PPIs for at least 4 weeks","Start antibiotics beforehand","Fast for 24 hours only"],"a":1,"ex":"PPIs must be discontinued for at least 4 weeks before urea breath or stool antigen testing to avoid a false negative."},{"num":48,"section":"Peptic Ulcer Disease","q":"What is the standard H. pylori quadruple therapy regimen?","opts":["PPI + amoxicillin + clarithromycin for 7 days","PPI BID + bismuth + tetracycline + metronidazole for 14 days","PPI once daily for 8 weeks alone","Bismuth alone for 30 days"],"a":1,"ex":"Quadruple therapy is 14 days of: PPI BID, bismuth 4x daily, tetracycline 500mg 4x daily, and metronidazole 500mg 4x daily."},{"num":49,"section":"Peptic Ulcer Disease","q":"What is the most common complication of peptic ulcer disease?","opts":["Perforation","Bleeding","Gastric outlet obstruction","Malignant transformation"],"a":1,"ex":"Bleeding is the most common complication of PUD."},{"num":50,"section":"Peptic Ulcer Disease","q":"Posterior duodenal ulcers classically penetrate into which structure?","opts":["The pancreas","The liver","The spleen","The colon"],"a":0,"ex":"Posterior duodenal ulcers classically penetrate into the pancreas, while perforation (free air under the diaphragm) is more associated with anterior ulcers."}];
+const LETTERS = ["A","B","C","D"];
+const answered = new Array(QUESTIONS.length).fill(null);
+const checked = new Array(QUESTIONS.length).fill(false);
+const struck = QUESTIONS.map(item => new Array(item.opts.length).fill(false));
+let graded = false;
+
+const container = document.getElementById("quiz-container");
+const gradeBtn = document.getElementById("grade-btn");
+const resetBtn = document.getElementById("reset-btn");
+const progressFill = document.getElementById("progress-bar-fill");
+const progressText = document.getElementById("progress-text");
+const results = document.getElementById("results");
+const scoreDisplay = document.getElementById("score-display");
+const scoreMsg = document.getElementById("score-msg");
+
+function render() {
+  container.innerHTML = "";
+  QUESTIONS.forEach((item, idx) => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.id = "card-" + idx;
+
+    const tag = document.createElement("div");
+    tag.className = "section-tag";
+    tag.textContent = item.section;
+    card.appendChild(tag);
+
+    const qtext = document.createElement("div");
+    qtext.className = "qtext";
+    qtext.innerHTML = '<span class="qnum">' + item.num + '.</span>' + item.q;
+    card.appendChild(qtext);
+
+    item.opts.forEach((opt, oi) => {
+      const optEl = document.createElement("div");
+      optEl.className = "opt";
+      optEl.id = "opt-" + idx + "-" + oi;
+
+      const content = document.createElement("div");
+      content.className = "opt-content";
+      content.innerHTML = '<span class="letter">' + LETTERS[oi] + '</span><span>' + opt + '</span>';
+      content.onclick = () => selectOption(idx, oi);
+      optEl.appendChild(content);
+
+      const strikeBtn = document.createElement("button");
+      strikeBtn.className = "strike-btn";
+      strikeBtn.type = "button";
+      strikeBtn.textContent = "Strike";
+      strikeBtn.onclick = (e) => { e.stopPropagation(); toggleStrike(idx, oi); };
+      optEl.appendChild(strikeBtn);
+
+      card.appendChild(optEl);
+    });
+
+    const actions = document.createElement("div");
+    actions.className = "card-actions";
+    const checkBtn = document.createElement("button");
+    checkBtn.className = "check-btn";
+    checkBtn.id = "check-" + idx;
+    checkBtn.textContent = "Check Answer";
+    checkBtn.disabled = true;
+    checkBtn.onclick = () => checkSingle(idx);
+    actions.appendChild(checkBtn);
+    card.appendChild(actions);
+
+    const fb = document.createElement("div");
+    fb.className = "feedback";
+    fb.id = "fb-" + idx;
+    card.appendChild(fb);
+
+    container.appendChild(card);
+  });
+}
+
+function selectOption(qIdx, oIdx) {
+  if (graded || checked[qIdx]) return;
+  answered[qIdx] = oIdx;
+  const card = document.getElementById("card-" + qIdx);
+  card.querySelectorAll(".opt").forEach((el, i) => {
+    el.classList.toggle("selected", i === oIdx);
+  });
+  document.getElementById("check-" + qIdx).disabled = false;
+  updateProgress();
+}
+
+function toggleStrike(qIdx, oIdx) {
+  if (graded || checked[qIdx]) return;
+  struck[qIdx][oIdx] = !struck[qIdx][oIdx];
+  const optEl = document.getElementById("opt-" + qIdx + "-" + oIdx);
+  optEl.classList.toggle("struck", struck[qIdx][oIdx]);
+  optEl.querySelector(".strike-btn").classList.toggle("active", struck[qIdx][oIdx]);
+}
+
+function revealAnswer(idx) {
+  const item = QUESTIONS[idx];
+  const card = document.getElementById("card-" + idx);
+  const opts = card.querySelectorAll(".opt");
+  const fb = document.getElementById("fb-" + idx);
+  const userAns = answered[idx];
+
+  opts.forEach((el, oi) => {
+    el.classList.add("disabled");
+    el.classList.remove("struck");
+    el.querySelector(".opt-content").onclick = null;
+    const sb = el.querySelector(".strike-btn");
+    if (sb) { sb.classList.add("hidden"); sb.onclick = null; }
+    if (oi === item.a) el.classList.add("correct");
+    else if (oi === userAns && userAns !== item.a) el.classList.add("incorrect");
+  });
+
+  const isCorrect = userAns === item.a;
+  fb.classList.add("show");
+  fb.classList.add(isCorrect ? "correct" : "incorrect");
+  let verdict;
+  if (userAns === null) verdict = "Not answered — correct answer: " + LETTERS[item.a];
+  else if (isCorrect) verdict = "Correct!";
+  else verdict = "Incorrect — correct answer: " + LETTERS[item.a];
+  fb.innerHTML = '<span class="verdict">' + verdict + '</span>' + item.ex;
+
+  const checkBtn = document.getElementById("check-" + idx);
+  checkBtn.disabled = true;
+  checkBtn.classList.add("checked");
+  checkBtn.textContent = "Checked";
+
+  checked[idx] = true;
+  return isCorrect;
+}
+
+function checkSingle(idx) {
+  if (answered[idx] === null || checked[idx]) return;
+  revealAnswer(idx);
+}
+
+function updateProgress() {
+  const count = answered.filter(a => a !== null).length;
+  const pct = Math.round((count / QUESTIONS.length) * 100);
+  progressFill.style.width = pct + "%";
+  progressText.textContent = count + " / " + QUESTIONS.length + " answered";
+  gradeBtn.disabled = count === 0;
+}
+
+function gradeQuiz() {
+  graded = true;
+  let score = 0;
+  QUESTIONS.forEach((item, idx) => {
+    let isCorrect;
+    if (checked[idx]) {
+      isCorrect = answered[idx] === item.a;
+    } else {
+      isCorrect = revealAnswer(idx);
+    }
+    if (isCorrect) score++;
+  });
+
+  const pct = Math.round((score / QUESTIONS.length) * 100);
+  scoreDisplay.textContent = score + " / " + QUESTIONS.length + " (" + pct + "%)";
+  let msg = "";
+  if (pct >= 90) msg = "Excellent — you've got this material down.";
+  else if (pct >= 75) msg = "Solid grasp — review the missed ones and you're set.";
+  else if (pct >= 50) msg = "Good start — worth another pass through the material.";
+  else msg = "Early days — go back through the study guide and try again.";
+  scoreMsg.textContent = msg;
+  results.style.display = "block";
+  results.scrollIntoView({ behavior: "smooth" });
+
+  gradeBtn.disabled = true;
+}
+
+function resetQuiz() {
+  graded = false;
+  answered.fill(null);
+  checked.fill(false);
+  struck.forEach(arr => arr.fill(false));
+  results.style.display = "none";
+  render();
+  updateProgress();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+gradeBtn.addEventListener("click", gradeQuiz);
+resetBtn.addEventListener("click", resetQuiz);
+
+render();
+updateProgress();
+</script>
+</body>
+</html>
