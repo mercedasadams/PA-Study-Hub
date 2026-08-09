@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PAS-523 Clinical Medicine II — GI Practice Exam</title>
+<style>
+  :root{
+    --navy:#0f2b46; --navy-light:#1c3f61; --accent:#0e7c86; --accent2:#b5651d;
+    --bg:#f6f7f9; --card:#ffffff; --border:#dde3ea; --text:#1b2430; --muted:#5a6572;
+    --correct:#1c7c3c; --correct-bg:#e7f6ec; --wrong:#b3261e; --wrong-bg:#fdecea;
+    --tier1:#8a1c1c;
+  }
+  *{box-sizing:border-box;}
+  body{
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background:var(--bg); color:var(--text); margin:0; padding:0; line-height:1.5;
+  }
+  header.exam-header{
+    background:linear-gradient(135deg,var(--navy),var(--navy-light));
+    color:#fff; padding:28px 24px;
+  }
+  header.exam-header h1{margin:0 0 6px; font-size:1.5rem;}
+  header.exam-header p{margin:2px 0; font-size:0.92rem; opacity:0.92;}
+  .disclaimer{
+    background:#fff8e6; border:1px solid #e8cf8a; color:#5c4a12; padding:12px 16px;
+    margin:16px 24px; border-radius:8px; font-size:0.85rem;
+  }
+  .toolbar{
+    position:sticky; top:0; z-index:50; background:#fff; border-bottom:1px solid var(--border);
+    padding:10px 24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;
+  }
+  .toolbar .stats{font-size:0.88rem; color:var(--muted);}
+  .toolbar button{
+    background:var(--navy); color:#fff; border:none; padding:8px 14px; border-radius:6px;
+    font-size:0.85rem; cursor:pointer;
+  }
+  .toolbar button.secondary{background:#fff; color:var(--navy); border:1px solid var(--navy);}
+  .toolbar button:hover{opacity:0.88;}
+  main{max-width:880px; margin:0 auto; padding:20px 16px 80px;}
+  .qcard{
+    background:var(--card); border:1px solid var(--border); border-radius:10px;
+    padding:18px 20px; margin-bottom:18px; scroll-margin-top:70px;
+  }
+  .qmeta{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px;}
+  .badge{
+    font-size:0.7rem; font-weight:600; padding:3px 9px; border-radius:20px; letter-spacing:0.02em;
+    background:#eef2f7; color:var(--navy); border:1px solid #d7e0ea;
+  }
+  .badge.cat{background:#e8f2f2; color:var(--accent); border-color:#cfe6e6;}
+  .qnum{font-weight:700; color:var(--navy);}
+  .stem{margin:10px 0 14px; font-size:0.98rem;}
+  .choice{
+    display:flex; align-items:flex-start; gap:10px; padding:9px 10px; border:1px solid var(--border);
+    border-radius:8px; margin-bottom:8px; cursor:pointer; transition:background 0.12s;
+  }
+  .choice:hover{background:#f4f7fa;}
+  .choice input[type=radio]{margin-top:3px;}
+  .choice .letter{font-weight:700; color:var(--navy); min-width:18px;}
+  .choice .ctext{flex:1; font-size:0.93rem;}
+  .choice.struck .ctext{text-decoration:line-through; opacity:0.45;}
+  .strike-btn{
+    border:1px solid var(--border); background:#fff; color:var(--muted); border-radius:5px;
+    width:24px; height:24px; font-size:0.75rem; cursor:pointer; flex-shrink:0; line-height:1;
+  }
+  .strike-btn:hover{background:#f1f1f1;}
+  .choice.selected{border-color:var(--navy); background:#eef4fb;}
+  .choice.correct-reveal{border-color:var(--correct); background:var(--correct-bg);}
+  .choice.wrong-reveal{border-color:var(--wrong); background:var(--wrong-bg);}
+  .qactions{display:flex; gap:10px; margin-top:10px; align-items:center;}
+  .btn-check{
+    background:var(--accent); color:#fff; border:none; padding:8px 16px; border-radius:6px;
+    font-size:0.85rem; cursor:pointer;
+  }
+  .btn-check:disabled{background:#aab8c2; cursor:not-allowed;}
+  .result-flag{font-weight:700; font-size:0.85rem;}
+  .result-flag.correct{color:var(--correct);}
+  .result-flag.incorrect{color:var(--wrong);}
+  .feedback{
+    display:none; margin-top:14px; border-top:1px dashed var(--border); padding-top:12px;
+  }
+  .feedback.show{display:block;}
+  .feedback h4{margin:0 0 4px; font-size:0.85rem; color:var(--navy);}
+  .rationale{font-size:0.9rem; margin-bottom:10px;}
+  .wrong-explain{font-size:0.87rem; margin:3px 0; color:var(--text);}
+  .wrong-explain b{color:var(--wrong);}
+  .metarow{
+    display:flex; flex-wrap:wrap; gap:14px; font-size:0.78rem; color:var(--muted); margin-top:10px;
+    border-top:1px solid var(--border); padding-top:8px;
+  }
+  .metarow span b{color:var(--navy);}
+  footer{text-align:center; padding:26px; font-size:0.8rem; color:var(--muted);}
+  #summaryBox{
+    display:none; background:var(--navy); color:#fff; border-radius:10px; padding:20px;
+    margin-bottom:20px;
+  }
+  #summaryBox.show{display:block;}
+  #summaryBox h2{margin-top:0;}
+  #summaryBox table{width:100%; border-collapse:collapse; margin-top:12px; font-size:0.85rem;}
+  #summaryBox td, #summaryBox th{padding:5px 8px; border-bottom:1px solid rgba(255,255,255,0.2); text-align:left;}
+  .scorebar{background:rgba(255,255,255,0.15); border-radius:6px; height:10px; overflow:hidden; margin-top:6px;}
+  .scorebar-fill{background:#4fd1a5; height:100%;}
+  #jumpnav{
+    display:flex; flex-wrap:wrap; gap:4px; margin:14px 24px 0; max-width:880px;
+  }
+  #jumpnav a{
+    width:26px; height:26px; display:flex; align-items:center; justify-content:center;
+    font-size:0.7rem; border-radius:5px; border:1px solid var(--border); color:var(--navy);
+    text-decoration:none; background:#fff;
+  }
+  #jumpnav a.answered{background:#dfeee3; border-color:var(--correct);}
+  #jumpnav a.wronged{background:#fbe4e1; border-color:var(--wrong);}
+</style>
+</head>
+<body>
+
+<header class="exam-header">
+  <h1>PAS-523 Clinical Medicine II — GI Practice Exam</h1>
+  <p>50 questions · Weighted per the Final GI Exam Blueprint</p>
+  <p>Prepared for Mercedas · Exam IV GI Block</p>
+</header>
+
+<div class="disclaimer">
+  <b>How this exam was built:</b> All medical facts, diagnostic criteria, and management steps are drawn directly from your six uploaded GI lecture decks. Topic weighting and emphasis follow your <i>Final Weighted GI Exam Blueprint</i>. Blueprint tier predictions and faculty-emphasis guesses are the professor's/blueprint's stated predictions, not confirmed exam content — treat them as study prioritization, not leaked material.
+</div>
+
+<div class="toolbar">
+  <div class="stats" id="statsLine">0 / 50 answered</div>
+  <div>
+    <button class="secondary" id="btnStrikeHelp" onclick="alert('Click the small ⌀ button next to any answer choice to cross it out while you work through the question — this does not submit that choice, it just hides it visually so you can narrow down your options.');">Cross-out tip</button>
+    <button id="btnSubmitExam">Submit Full Exam</button>
+  </div>
+</div>
+
+<div id="jumpnav"></div>
+
+<main>
+  <div id="summaryBox">
+    <h2>Exam Summary</h2>
+    <div id="summaryScore"></div>
+    <div class="scorebar"><div class="scorebar-fill" id="scorebarFill" style="width:0%"></div></div>
+    <table id="summaryTable"></table>
+  </div>
+
+  <div id="examContainer"></div>
+</main>
+
+<footer>
+  Practice exam generated from your uploaded materials. Not an official PAS-523 exam. Verify against your syllabus/professor guidance before relying on any single prediction.
+</footer>
+
+<script id="examData" type="application/json">
+[
+  {
+    "num": 1,
+    "category": "GI Anatomy & Physiology",
+    "bloom": "Understand",
+    "task": "Pathophysiology / Function",
+    "source": "Lecture 1",
+    "stem": "Which of the following best describes the primary physiologic role of gastric parietal cells?",
+    "choices": {
+      "A": "Secretion of pepsinogen for initial protein digestion",
+      "B": "Secretion of gastrin to stimulate acid production",
+      "C": "Secretion of mucus and bicarbonate to protect the gastric epithelium",
+      "D": "Secretion of intrinsic factor only, with acid production occurring elsewhere",
+      "E": "Secretion of hydrochloric acid and intrinsic factor required for vitamin B12 absorption"
+    },
+    "correct": "E",
+    "rationale": "Parietal cells are the gastric cell type responsible for secreting both hydrochloric acid and intrinsic factor, which is required for vitamin B12 absorption in the terminal ileum. Loss of parietal cell function (e.g., autoimmune gastritis) leads to both hypochlorhydria and B12 deficiency.",
+    "wrong": {
+      "A": "Pepsinogen is secreted by chief cells, not parietal cells.",
+      "B": "Gastrin is secreted by antral G cells, which then stimulates parietal cells to release acid.",
+      "C": "Mucus and bicarbonate protection is provided by mucous neck/surface mucous cells, not parietal cells.",
+      "D": "Parietal cells secrete both acid and intrinsic factor together; the statement incorrectly separates these functions."
+    }
+  },
+  {
+    "num": 2,
+    "category": "Esophageal Disorders",
+    "bloom": "Apply",
+    "task": "Diagnostic selection",
+    "source": "Lecture 2",
+    "stem": "A 61-year-old man reports 3 months of progressively worsening difficulty swallowing solid foods such as bread and steak, though he has no trouble swallowing liquids. He has lost 8 pounds and reports occasional regurgitation of undigested food. He denies heartburn. Which of the following is the most appropriate next diagnostic step?",
+    "choices": {
+      "A": "Upper endoscopy with biopsy",
+      "B": "High-resolution esophageal manometry",
+      "C": "24-hour ambulatory pH monitoring",
+      "D": "Barium esophagram alone, without endoscopy",
+      "E": "Empiric trial of a proton pump inhibitor without further testing"
+    },
+    "correct": "A",
+    "rationale": "Progressive dysphagia limited to solids, especially with weight loss, is a mechanical/structural pattern with alarm features. The dysphagia algorithm directs these patients to upper endoscopy with biopsy to evaluate for a stricture, ring, or malignancy.",
+    "wrong": {
+      "B": "Manometry is reserved for suspected motility disorders, which typically cause dysphagia to both solids and liquids, not an isolated progressive solid-food pattern.",
+      "C": "pH monitoring is used to confirm GERD when endoscopy is normal and reflux needs objective confirmation; it does not evaluate this patient's alarm symptoms.",
+      "D": "Barium esophagram can be a useful adjunct but does not allow tissue sampling; with weight loss and progressive solid dysphagia, endoscopy with biopsy is required.",
+      "E": "Alarm features (progressive dysphagia, weight loss) preclude an empiric PPI trial without further evaluation."
+    }
+  },
+  {
+    "num": 3,
+    "category": "Hepatic & Biliary Disorders",
+    "bloom": "Analyze",
+    "task": "Definitive management",
+    "source": "Lecture 5",
+    "stem": "A 58-year-old woman presents with 2 days of fever, chills, and right upper quadrant pain. In the emergency department she becomes confused and her blood pressure drops to 82/50 mm Hg despite fluids. Labs show a WBC of 18,000/uL, total bilirubin 4.8 mg/dL, and alkaline phosphatase 410 U/L. Abdominal ultrasound shows a dilated common bile duct with a stone. After initiating fluid resuscitation and broad-spectrum antibiotics, which of the following is the most appropriate next step?",
+    "choices": {
+      "A": "Discharge home on oral antibiotics once afebrile",
+      "B": "Elective outpatient MRCP in 2 weeks",
+      "C": "Observation with serial abdominal exams",
+      "D": "Laparoscopic cholecystectomy within 72 hours",
+      "E": "Urgent ERCP for biliary decompression"
+    },
+    "correct": "E",
+    "rationale": "This patient has Reynolds pentad (fever, jaundice, RUQ pain, hypotension, and altered mental status), indicating severe ascending cholangitis. After resuscitation and antibiotics, urgent biliary drainage via ERCP is the definitive source-control step.",
+    "wrong": {
+      "A": "Discharge is inappropriate; the patient is septic and hemodynamically unstable and requires urgent drainage.",
+      "B": "Elective, delayed imaging does not address the acute obstructed, infected biliary system.",
+      "C": "Observation alone will not resolve the obstruction driving ongoing sepsis.",
+      "D": "Cholecystectomy may follow later but is not the immediate priority; biliary source control (drainage) takes precedence over gallbladder removal in cholangitis."
+    }
+  },
+  {
+    "num": 4,
+    "category": "Small Bowel & Colonic Disorders",
+    "bloom": "Analyze",
+    "task": "Diagnosis / differentiation",
+    "source": "Lecture 4",
+    "stem": "A 24-year-old woman presents with 4 months of crampy right lower quadrant abdominal pain, nonbloody diarrhea, and a 12-lb weight loss. Colonoscopy reveals segmental areas of inflammation separated by normal-appearing mucosa, with cobblestone-appearing mucosa and aphthous ulcerations in the terminal ileum. Biopsy demonstrates transmural inflammation with noncaseating granulomas. Which of the following is the most likely diagnosis?",
+    "choices": {
+      "A": "Ulcerative colitis",
+      "B": "Crohn disease",
+      "C": "Ischemic colitis",
+      "D": "Infectious colitis",
+      "E": "Irritable bowel syndrome"
+    },
+    "correct": "B",
+    "rationale": "Segmental ('skip') lesions, cobblestoning, transmural inflammation, and noncaseating granulomas involving the terminal ileum are characteristic of Crohn disease.",
+    "wrong": {
+      "A": "Ulcerative colitis causes continuous mucosal/submucosal inflammation beginning in the rectum, not skip lesions or transmural granulomatous disease.",
+      "C": "Ischemic colitis typically occurs in older patients with vascular risk factors and shows watershed-area changes on imaging, not skip lesions with granulomas.",
+      "D": "Infectious colitis is typically acute and does not produce transmural granulomatous inflammation.",
+      "E": "IBS is a functional disorder without mucosal ulceration, granulomas, or transmural inflammation."
+    }
+  },
+  {
+    "num": 5,
+    "category": "Stomach & Duodenal Disorders",
+    "bloom": "Apply",
+    "task": "Diagnosis",
+    "source": "Lecture 3",
+    "stem": "A 5-week-old male infant is brought in for evaluation of forceful, nonbilious vomiting after every feeding for the past week. He remains hungry immediately after vomiting. On examination, a firm, olive-shaped mass is palpated in the epigastrium. A basic metabolic panel reveals a chloride of 88 mEq/L, potassium of 3.0 mEq/L, and bicarbonate of 32 mEq/L. Which of the following is the most likely diagnosis?",
+    "choices": {
+      "A": "Hypertrophic pyloric stenosis",
+      "B": "Malrotation with midgut volvulus",
+      "C": "Gastroesophageal reflux disease",
+      "D": "Duodenal atresia",
+      "E": "Intussusception"
+    },
+    "correct": "A",
+    "rationale": "Nonbilious, projectile vomiting in an infant with a palpable olive-shaped mass and hypochloremic, hypokalemic metabolic alkalosis is classic for hypertrophic pyloric stenosis, an obstruction proximal to the ampulla of Vater.",
+    "wrong": {
+      "B": "Malrotation with volvulus classically presents with bilious vomiting, since the obstruction is distal to the ampulla of Vater.",
+      "C": "GERD does not cause a palpable olive mass or hypochloremic, hypokalemic metabolic alkalosis.",
+      "D": "Duodenal atresia typically presents at birth with bilious vomiting and a 'double bubble' sign on imaging.",
+      "E": "Intussusception presents with episodic colicky pain and currant jelly stools, not projectile nonbilious vomiting with this electrolyte pattern."
+    }
+  },
+  {
+    "num": 6,
+    "category": "Hepatic & Biliary Disorders",
+    "bloom": "Apply",
+    "task": "Pharmacotherapy",
+    "source": "Lecture 5",
+    "stem": "A 62-year-old man with cirrhosis due to alcohol use disorder is brought in by family for increasing confusion over the past 2 days. On examination he is disoriented to time and has a flapping tremor when his wrists are extended. His ammonia level is elevated. Which of the following is the most appropriate initial pharmacologic treatment?",
+    "choices": {
+      "A": "Intravenous ceftriaxone",
+      "B": "Oral rifaximin monotherapy",
+      "C": "Intravenous furosemide",
+      "D": "Lactulose",
+      "E": "Intravenous mannitol"
+    },
+    "correct": "D",
+    "rationale": "This patient has hepatic encephalopathy, demonstrated by confusion and asterixis. Lactulose is first-line therapy; gut bacteria convert it to lactic and fatty acids that trap and eliminate ammonia.",
+    "wrong": {
+      "A": "Ceftriaxone would be appropriate if an infectious precipitant (such as spontaneous bacterial peritonitis) were suspected, but it does not directly treat encephalopathy.",
+      "B": "Rifaximin is an alternative for patients who do not tolerate or respond to lactulose, not the initial agent.",
+      "C": "Furosemide is used for ascites/edema management, not for encephalopathy.",
+      "E": "Mannitol is used for cerebral edema in acute/fulminant liver failure, not typical cirrhotic hepatic encephalopathy."
+    }
+  },
+  {
+    "num": 7,
+    "category": "Small Bowel & Colonic Disorders",
+    "bloom": "Analyze",
+    "task": "Diagnosis / imaging interpretation",
+    "source": "Lecture 4",
+    "stem": "A 68-year-old woman is postoperative day 2 after an exploratory laparotomy. She has diffuse abdominal distention, has not passed flatus, and has hypoactive bowel sounds throughout. Abdominal CT shows diffusely dilated loops of small and large bowel without a discrete transition point. Which of the following is the most likely diagnosis?",
+    "choices": {
+      "A": "Mechanical small bowel obstruction",
+      "B": "Paralytic ileus",
+      "C": "Acute mesenteric ischemia",
+      "D": "Sigmoid volvulus",
+      "E": "Toxic megacolon"
+    },
+    "correct": "B",
+    "rationale": "Diffuse bowel dilation without a discrete transition point in a postoperative patient is characteristic of paralytic (adynamic) ileus, a functional rather than mechanical process.",
+    "wrong": {
+      "A": "Mechanical SBO characteristically shows a transition point with proximal dilation and distal decompression, which is absent here.",
+      "C": "Mesenteric ischemia presents with pain out of proportion to examination findings, not simply diffuse postoperative dilation.",
+      "D": "Sigmoid volvulus produces a focal twist with a specific dilated-loop appearance, not diffuse dilation.",
+      "E": "Toxic megacolon requires colonic dilation with systemic toxicity in the setting of colitis, not a routine postoperative picture."
+    }
+  },
+  {
+    "num": 8,
+    "category": "Esophageal Disorders",
+    "bloom": "Analyze",
+    "task": "Pathophysiology",
+    "source": "Lecture 2",
+    "stem": "A 45-year-old woman reports several months of intermittent difficulty swallowing both solids and liquids, occasionally accompanied by regurgitation of undigested food and mild retrosternal chest discomfort. Barium esophagram demonstrates a dilated esophageal body that tapers to a smooth, beak-like narrowing at the gastroesophageal junction. Which of the following best describes the underlying pathophysiology?",
+    "choices": {
+      "A": "Preserved lower esophageal sphincter relaxation with premature simultaneous contractions",
+      "B": "Impaired relaxation of the lower esophageal sphincter due to loss of inhibitory myenteric neurons",
+      "C": "Transient relaxation of the lower esophageal sphincter allowing reflux of gastric contents",
+      "D": "Eosinophilic infiltration of the esophageal mucosa causing luminal narrowing",
+      "E": "Mucosal tear at the gastroesophageal junction from forceful retching"
+    },
+    "correct": "B",
+    "rationale": "The bird-beak appearance with solid and liquid dysphagia reflects achalasia, caused by degeneration of inhibitory myenteric neurons leading to loss of nitric oxide-mediated relaxation and impaired LES relaxation.",
+    "wrong": {
+      "A": "This describes diffuse esophageal spasm, in which LES relaxation is preserved (unlike achalasia) and the barium finding is a corkscrew, not a bird-beak.",
+      "C": "This describes the mechanism of GERD, not achalasia.",
+      "D": "This describes eosinophilic esophagitis, which presents with rings/furrows and food impaction rather than a bird-beak sign.",
+      "E": "This describes a Mallory-Weiss tear, an acute mucosal injury unrelated to this chronic motility disorder."
+    }
+  },
+  {
+    "num": 9,
+    "category": "Nutritional/Vitamin/Metabolic Disorders",
+    "bloom": "Apply",
+    "task": "Pathophysiology / complication recognition",
+    "source": "Lecture 6",
+    "stem": "A 22-year-old woman with anorexia nervosa and a BMI of 14 kg/m2 is admitted for initiation of nutritional rehabilitation after minimal oral intake for the past 3 weeks. On hospital day 2, shortly after starting enteral feeding, she develops tachypnea, tachycardia, and generalized muscle weakness. Which laboratory abnormality is most likely responsible for this presentation?",
+    "choices": {
+      "A": "Hypernatremia",
+      "B": "Hyperkalemia",
+      "C": "Hypercalcemia",
+      "D": "Hypophosphatemia",
+      "E": "Hyperglycemia"
+    },
+    "correct": "D",
+    "rationale": "This is refeeding syndrome. Carbohydrate reintroduction triggers an insulin surge that drives phosphate (along with potassium and magnesium) intracellularly, causing hypophosphatemia, the classic marker responsible for cardiac and respiratory muscle dysfunction.",
+    "wrong": {
+      "A": "Refeeding is more commonly associated with fluid shifts and hyponatremia risk, not hypernatremia, and sodium is not the classic marker.",
+      "B": "Refeeding causes hypokalemia from an intracellular shift driven by insulin, not hyperkalemia.",
+      "C": "Hypocalcemia (not hypercalcemia) can occur but is not the hallmark electrolyte abnormality of refeeding syndrome; phosphate is the key ion.",
+      "E": "Insulin-driven glucose uptake typically lowers, rather than raises, serum glucose acutely; hyperglycemia is not the dangerous marker in refeeding syndrome."
+    }
+  },
+  {
+    "num": 10,
+    "category": "Hepatic & Biliary Disorders",
+    "bloom": "Apply",
+    "task": "Diagnostic selection",
+    "source": "Lecture 5",
+    "stem": "A 40-year-old woman presents with 6 hours of severe right upper quadrant pain, fever of 38.9C, and nausea. On examination she has voluntary guarding in the right upper quadrant, and her pain increases with palpation during inspiration, causing her to abruptly stop breathing in. Labs show a WBC of 14,500/uL. Which of the following is the most appropriate initial imaging study?",
+    "choices": {
+      "A": "CT abdomen/pelvis without contrast",
+      "B": "MRCP",
+      "C": "ERCP",
+      "D": "HIDA scan",
+      "E": "Right upper quadrant ultrasound"
+    },
+    "correct": "E",
+    "rationale": "This presentation (fever, RUQ pain, leukocytosis, positive Murphy sign) is consistent with acute cholecystitis. RUQ ultrasound is the first-line imaging study, evaluating for gallbladder wall thickening, distention, stones, and a sonographic Murphy sign.",
+    "wrong": {
+      "A": "CT is not first-line for suspected gallbladder disease and is less sensitive than ultrasound for detecting gallstones.",
+      "B": "MRCP would be considered if common bile duct pathology were suspected, but it is not the initial study for suspected cholecystitis.",
+      "C": "ERCP is an invasive, largely therapeutic procedure reserved for confirmed choledocholithiasis or cholangitis, not initial evaluation.",
+      "D": "HIDA scan is reserved for cases where the diagnosis remains unclear after ultrasound, such as a nonvisualized gallbladder."
+    }
+  },
+  {
+    "num": 11,
+    "category": "Small Bowel & Colonic Disorders",
+    "bloom": "Apply",
+    "task": "Management",
+    "source": "Lecture 4",
+    "stem": "A 64-year-old man presents with 2 days of left lower quadrant pain, low-grade fever, and mild leukocytosis. CT abdomen/pelvis with contrast shows localized sigmoid colon wall thickening with pericolonic fat stranding and a small diverticulum, without abscess or free air. Which of the following is the most appropriate next step in management?",
+    "choices": {
+      "A": "Colonoscopy within 24 hours to confirm the diagnosis",
+      "B": "Emergent surgical resection",
+      "C": "Outpatient antibiotics with oral intake as tolerated",
+      "D": "Colonoscopy in 48 hours to assess for malignancy",
+      "E": "IV vancomycin and admission to the intensive care unit"
+    },
+    "correct": "C",
+    "rationale": "This is uncomplicated acute diverticulitis (no abscess, perforation, or obstruction on CT), which can typically be managed as an outpatient with antibiotics and diet as tolerated.",
+    "wrong": {
+      "A": "Colonoscopy is contraindicated during acute diverticulitis due to the risk of perforation.",
+      "B": "Uncomplicated diverticulitis without abscess or perforation does not require emergent surgery.",
+      "D": "Colonoscopy should be delayed roughly 6-8 weeks after resolution of the acute episode, not performed acutely at 48 hours.",
+      "E": "This patient is stable and does not meet criteria for ICU-level care; outpatient management is appropriate for uncomplicated disease."
+    }
+  },
+  {
+    "num": 12,
+    "category": "Abdominal Wall Hernias",
+    "bloom": "Analyze",
+    "task": "Management / emergency recognition",
+    "source": "Lecture 6",
+    "stem": "A 55-year-old woman presents with a tender, firm bulge below the inguinal ligament, medial to the femoral vessels, that has been present for 6 hours and is not reducible with gentle pressure. She reports nausea and the area has become increasingly painful. Which of the following is the most appropriate management?",
+    "choices": {
+      "A": "Reassurance and outpatient follow-up in 2 weeks",
+      "B": "Attempt manual reduction with sedation, then discharge if successful",
+      "C": "Elective laparoscopic repair in 4-6 weeks",
+      "D": "Emergency surgical exploration and repair",
+      "E": "Application of a truss/hernia belt with activity restriction"
+    },
+    "correct": "D",
+    "rationale": "This describes a femoral hernia, which has a high risk of incarceration/strangulation, particularly in women. A firm, painful, nonreducible mass requires emergency surgical exploration; normal lactate does not exclude strangulation.",
+    "wrong": {
+      "A": "A painful, nonreducible hernia raises concern for incarceration/strangulation and cannot be safely delayed for outpatient follow-up.",
+      "B": "Attempting reduction of a potentially strangulated hernia risks returning necrotic bowel into the abdomen; femoral hernias in women carry high strangulation risk and warrant urgent surgical evaluation rather than sedated reduction.",
+      "C": "Elective, delayed repair is inappropriate given signs concerning for strangulation.",
+      "E": "A truss is not therapeutic for an acutely incarcerated/strangulated hernia."
+    }
+  },
+  {
+    "num": 13,
+    "category": "Esophageal Disorders",
+    "bloom": "Analyze",
+    "task": "Diagnosis",
+    "source": "Lecture 2",
+    "stem": "A 50-year-old man with a history of heavy alcohol use presents with severe retrosternal chest pain and epigastric pain that began immediately after an episode of forceful vomiting. He appears acutely ill, with subcutaneous crepitus palpated in the neck and a temperature of 38.5C. Which of the following is the most likely diagnosis?",
+    "choices": {
+      "A": "Boerhaave syndrome",
+      "B": "Mallory-Weiss tear",
+      "C": "Esophageal variceal hemorrhage",
+      "D": "Peptic ulcer perforation",
+      "E": "Acute pancreatitis"
+    },
+    "correct": "A",
+    "rationale": "Severe chest/epigastric pain after forceful vomiting with subcutaneous emphysema and fever indicates transmural esophageal rupture (Boerhaave syndrome), a surgical emergency.",
+    "wrong": {
+      "B": "Mallory-Weiss tear is a mucosal (not transmural) tear causing hematemesis; it does not cause subcutaneous emphysema or mediastinitis.",
+      "C": "Variceal hemorrhage presents with hematemesis in a patient with portal hypertension, not crepitus or mediastinal signs after retching.",
+      "D": "Ulcer perforation causes acute abdominal peritonitis but would not typically cause cervical subcutaneous emphysema from esophageal rupture.",
+      "E": "Pancreatitis causes epigastric pain radiating to the back, not chest pain with cervical crepitus after vomiting."
+    }
+  },
+  {
+    "num": 14,
+    "category": "Hepatic & Biliary Disorders",
+    "bloom": "Apply",
+    "task": "Pharmacotherapy",
+    "source": "Lecture 5",
+    "stem": "A 57-year-old man with cirrhosis presents with worsening abdominal distention and lower extremity edema. Physical examination reveals shifting dullness and a fluid wave. He is started on dietary sodium restriction. Which of the following is the most appropriate initial pharmacologic therapy to add?",
+    "choices": {
+      "A": "Furosemide monotherapy",
+      "B": "Nonselective beta-blocker",
+      "C": "Terlipressin",
+      "D": "Spironolactone",
+      "E": "Octreotide"
+    },
+    "correct": "D",
+    "rationale": "Spironolactone, an aldosterone antagonist, is the anchor of initial diuretic therapy for cirrhotic ascites (often combined with furosemide), targeting the secondary hyperaldosteronism driving sodium/fluid retention.",
+    "wrong": {
+      "A": "Furosemide alone, without an aldosterone antagonist, is less effective for cirrhotic ascites than spironolactone-based therapy.",
+      "B": "Nonselective beta-blockers are used for variceal hemorrhage prophylaxis, not as primary ascites treatment.",
+      "C": "Terlipressin is used for hepatorenal syndrome or variceal bleeding, not routine ascites management.",
+      "E": "Octreotide is used in acute variceal hemorrhage, not ascites management."
+    }
+  },
+  {
+    "num": 15,
+    "category": "Small Bowel & Colonic Disorders",
+    "bloom": "Analyze",
+    "task": "Diagnostic selection",
+    "source": "Lecture 4",
+    "stem": "A 78-year-old woman with atrial fibrillation not on anticoagulation presents with the sudden onset of severe abdominal pain that is disproportionate to her benign-appearing abdominal examination. She has associated nausea and one episode of loose, guaiac-positive stool. Lactate is elevated. Which of the following is the most appropriate next diagnostic step?",
+    "choices": {
+      "A": "CT angiography of the abdomen",
+      "B": "Colonoscopy",
+      "C": "Abdominal ultrasound",
+      "D": "Upper endoscopy",
+      "E": "Plain abdominal radiograph"
+    },
+    "correct": "A",
+    "rationale": "Pain out of proportion to examination findings in a patient with an embolic source (atrial fibrillation, no anticoagulation) suggests acute mesenteric ischemia. CT angiography is the first-line diagnostic test in a stable patient.",
+    "wrong": {
+      "B": "Colonoscopy is used to confirm ischemic colitis once the patient is stable, not the first test for suspected acute mesenteric ischemia from an embolic source.",
+      "C": "Ultrasound has limited sensitivity for evaluating the mesenteric vasculature.",
+      "D": "Upper endoscopy does not evaluate the mesenteric vessels or small/large bowel perfusion.",
+      "E": "Plain radiography does not reliably detect early mesenteric ischemia; it is more useful for evaluating free air or obstruction."
+    }
+  },
+  {
+    "num": 16,
+    "category": "Pancreatic Disorders",
+    "bloom": "Apply",
+    "task": "Management",
+    "source": "Lecture 5",
+    "stem": "A 45-year-old man with a history of heavy alcohol use presents with severe, constant epigastric pain radiating to his back, associated with nausea and vomiting. Lipase is 950 U/L (upper limit of normal 160 U/L). Which of the following is the most appropriate initial management?",
+    "choices": {
+      "A": "Emergent ERCP",
+      "B": "IV fluid resuscitation, pain control, and antiemetics",
+      "C": "Broad-spectrum IV antibiotics",
+      "D": "Immediate contrast-enhanced CT abdomen",
+      "E": "NPO status with total parenteral nutrition started immediately"
+    },
+    "correct": "B",
+    "rationale": "This patient meets 2 of the 3 diagnostic criteria for acute pancreatitis (typical pain and lipase greater than or equal to 3x ULN). Initial management is supportive: IV fluids, analgesia, and antiemetics.",
+    "wrong": {
+      "A": "ERCP is indicated for gallstone pancreatitis with cholangitis or ongoing obstruction, not as routine initial management of alcohol-induced pancreatitis.",
+      "C": "Antibiotics are reserved for suspected or confirmed infection, not routine initial management.",
+      "D": "Imaging is not required for diagnosis when clinical criteria are already met; CT is reserved for atypical presentations or evaluating complications.",
+      "E": "Early oral or enteral feeding as tolerated is preferred over TPN; TPN is not first-line supportive care."
+    }
+  },
+  {
+    "num": 17,
+    "category": "GI Emergencies, Toxicities & Foreign Bodies",
+    "bloom": "Apply",
+    "task": "Initial management / emergency sequencing",
+    "source": "Lecture 6",
+    "stem": "A 3-year-old child is brought to the emergency department after being found with an open bottle of drain cleaner. He is drooling and has audible stridor. Which of the following is the most appropriate initial step in management?",
+    "choices": {
+      "A": "Induce vomiting to remove the ingested substance",
+      "B": "Administer activated charcoal",
+      "C": "Perform gastric lavage",
+      "D": "Neutralize the agent with a diluted acid or base",
+      "E": "Assess and secure the airway"
+    },
+    "correct": "E",
+    "rationale": "Stridor and drooling suggest airway compromise from caustic injury. Airway assessment and management (including early intubation if needed) takes priority over all other interventions.",
+    "wrong": {
+      "A": "Induced emesis recontaminates the esophagus with caustic material and is contraindicated.",
+      "B": "Activated charcoal does not adsorb caustic agents and obscures subsequent endoscopy.",
+      "C": "Gastric lavage can worsen mucosal injury and is contraindicated.",
+      "D": "Neutralization causes an exothermic reaction that increases tissue injury and is contraindicated."
+    }
+  },
+  {
+    "num": 18,
+    "category": "Hepatic & Biliary Disorders",
+    "bloom": "Analyze",
+    "task": "Pharmacotherapy / emergency sequencing",
+    "source": "Lecture 5",
+    "stem": "A 60-year-old man with known esophageal varices presents with large-volume hematemesis and a heart rate of 128 beats/min with a blood pressure of 84/50 mm Hg. Two large-bore IVs are placed and fluid resuscitation is begun. Which of the following medications should be administered next, prior to endoscopy?",
+    "choices": {
+      "A": "Oral propranolol",
+      "B": "IV furosemide",
+      "C": "IV octreotide and ceftriaxone",
+      "D": "Oral lactulose",
+      "E": "IV heparin"
+    },
+    "correct": "C",
+    "rationale": "Acute variceal hemorrhage management includes octreotide (to reduce splanchnic blood flow/portal pressure) and prophylactic antibiotics (ceftriaxone) in addition to resuscitation, prior to endoscopic therapy.",
+    "wrong": {
+      "A": "Propranolol is used for long-term prophylaxis after stabilization, not during acute hemorrhage.",
+      "B": "Furosemide treats ascites and could worsen hypovolemia in an actively bleeding, hypotensive patient.",
+      "D": "Lactulose treats hepatic encephalopathy; it is not the priority medication to prevent ongoing hemorrhage before endoscopy.",
+      "E": "Heparin is contraindicated in active GI hemorrhage, as it would worsen bleeding."
+    }
+  },
+  {
+    "num": 19,
+    "category": "Small Bowel & Colonic Disorders",
+    "bloom": "Apply",
+    "task": "Management / contraindication",
+    "source": "Lecture 4",
+    "stem": "A 35-year-old woman with a 5-year history of ulcerative colitis presents with worsening bloody diarrhea, fever, and abdominal distention. Abdominal radiograph shows a transverse colon diameter of 7 cm. She is tachycardic and appears acutely ill. Which of the following medications should be avoided in her management?",
+    "choices": {
+      "A": "IV fluids",
+      "B": "Loperamide",
+      "C": "IV broad-spectrum antibiotics",
+      "D": "IV corticosteroids",
+      "E": "Electrolyte repletion"
+    },
+    "correct": "B",
+    "rationale": "This patient has toxic megacolon (colonic dilation with systemic toxicity in the setting of colitis). Antimotility agents such as loperamide should be avoided, as they can precipitate progression to perforation.",
+    "wrong": {
+      "A": "IV fluids are appropriate supportive care for toxic megacolon.",
+      "C": "Broad-spectrum antibiotics are appropriate given the risk of bacterial translocation/perforation.",
+      "D": "IV corticosteroids are appropriate to treat the underlying IBD flare driving toxic megacolon.",
+      "E": "Electrolyte repletion is appropriate supportive management."
+    }
+  },
+  {
+    "num": 20,
+    "category": "Colorectal & Perianal Disorders",
+    "bloom": "Apply",
+    "task": "Management / treatment escalation",
+    "source": "Lecture 4",
+    "stem": "A 32-year-old man reports sharp, severe pain with defecation for the past 6 weeks, along with small amounts of bright red blood on the toilet paper. On examination, a linear tear is noted in the posterior midline of the anal canal, with no evidence of fluctuance or erythema. Initial treatment with fiber, sitz baths, and stool softeners has not improved symptoms after 6 weeks. Which of the following is the most appropriate next step?",
+    "choices": {
+      "A": "Incision and drainage",
+      "B": "Rubber band ligation",
+      "C": "Immediate lateral internal sphincterotomy",
+      "D": "Topical nitroglycerin or nifedipine",
+      "E": "Oral antibiotics"
+    },
+    "correct": "D",
+    "rationale": "This is a chronic anal fissure. After conservative measures fail, the next step in the treatment escalation is a topical vasodilator (nitroglycerin or nifedipine) before considering surgery.",
+    "wrong": {
+      "A": "Incision and drainage is indicated for an abscess, not a fissure; there is no fluctuance or erythema described here.",
+      "B": "Rubber band ligation treats internal hemorrhoids, not anal fissures.",
+      "C": "Sphincterotomy is reserved for chronic/refractory fissures after topical vasodilator therapy has failed; it is not the immediate next step in the escalation pathway.",
+      "E": "Antibiotics are not indicated for an uncomplicated fissure without evidence of infection."
+    }
+  },
+  {
+    "num": 21,
+    "category": "Esophageal Disorders",
+    "bloom": "Apply",
+    "task": "Diagnosis",
+    "source": "Lecture 2",
+    "stem": "A 28-year-old man with a history of asthma and seasonal allergies presents to the emergency department after food became stuck in his throat while eating steak; he now has substernal chest discomfort and is unable to swallow his saliva. This is his third similar episode in the past year. Which of the following is the most likely underlying diagnosis?",
+    "choices": {
+      "A": "Gastroesophageal reflux disease",
+      "B": "Achalasia",
+      "C": "Eosinophilic esophagitis",
+      "D": "Esophageal squamous cell carcinoma",
+      "E": "Zenker diverticulum"
+    },
+    "correct": "C",
+    "rationale": "Recurrent food impaction in a young patient with atopic history (asthma, seasonal allergies) is characteristic of eosinophilic esophagitis.",
+    "wrong": {
+      "A": "GERD causes heartburn/regurgitation, not recurrent solid food impaction, though the two conditions can coexist.",
+      "B": "Achalasia causes gradually progressive dysphagia to solids and liquids rather than recurrent acute impaction episodes in a young atopic patient.",
+      "D": "Malignancy is unlikely in a young patient with an atopic history and recurrent impactions.",
+      "E": "Zenker diverticulum typically presents in older patients with regurgitation of undigested food, halitosis, and cervical dysphagia, not acute food impaction in a young adult."
+    }
+  },
+  {
+    "num": 22,
+    "category": "Hepatic & Biliary Disorders",
+    "bloom": "Apply",
+    "task": "Diagnostic testing / screening",
+    "source": "Lecture 5",
+    "stem": "A 55-year-old man with cirrhosis secondary to chronic hepatitis B undergoes routine surveillance imaging. Which of the following is the most appropriate surveillance strategy for hepatocellular carcinoma in this patient?",
+    "choices": {
+      "A": "Annual contrast-enhanced MRI only",
+      "B": "CEA level every 6 months",
+      "C": "Abdominal ultrasound with or without alpha-fetoprotein every 6 months",
+      "D": "CT abdomen every 3 years",
+      "E": "Liver biopsy annually"
+    },
+    "correct": "C",
+    "rationale": "Standard HCC surveillance in cirrhotic patients is abdominal ultrasound (with or without AFP) every 6 months.",
+    "wrong": {
+      "A": "MRI is not the standard first-line surveillance modality due to cost; it is reserved for indeterminate lesions.",
+      "B": "CEA is a colorectal cancer tumor marker and is not used for HCC surveillance.",
+      "D": "A 3-year interval is far too infrequent for a cirrhotic, high-risk patient.",
+      "E": "Biopsy is not used as a routine surveillance tool; imaging-based surveillance is standard, with biopsy reserved for confirming a suspicious lesion."
+    }
+  },
+  {
+    "num": 23,
+    "category": "Small Bowel & Colonic Disorders",
+    "bloom": "Apply",
+    "task": "Diagnostic testing",
+    "source": "Lecture 3",
+    "stem": "A 30-year-old woman presents with chronic diarrhea, bloating, and iron-deficiency anemia. She has been eating a regular gluten-containing diet. Which of the following is the most appropriate initial diagnostic test?",
+    "choices": {
+      "A": "Duodenal biopsy",
+      "B": "HLA-DQ2/DQ8 genetic testing",
+      "C": "Stool ova and parasites",
+      "D": "Fecal calprotectin",
+      "E": "IgA anti-tissue transglutaminase antibody with total IgA level"
+    },
+    "correct": "E",
+    "rationale": "tTG-IgA with a total IgA level is the recommended first-line serologic test for celiac disease; checking total IgA identifies selective IgA deficiency, which can cause a false-negative tTG-IgA.",
+    "wrong": {
+      "A": "Duodenal biopsy is confirmatory and is performed after positive serologic testing, not as the initial test.",
+      "B": "HLA testing has high negative predictive value but is not the first-line diagnostic test for most patients.",
+      "C": "Stool studies for ova and parasites do not evaluate for suspected celiac disease.",
+      "D": "Fecal calprotectin evaluates for intestinal inflammation (such as in IBD) and is not specific for celiac disease."
+    }
+  },
+  {
+    "num": 24,
+    "category": "GI Anatomy & Physiology",
+    "bloom": "Apply",
+    "task": "Pathophysiology / anatomy-function",
+    "source": "Lecture 1",
+    "stem": "A patient who underwent surgical resection of the terminal ileum is most likely to develop deficiencies of which of the following?",
+    "choices": {
+      "A": "Iron and calcium",
+      "B": "Folate and thiamine",
+      "C": "Vitamin B12 and bile salts",
+      "D": "Vitamin C and zinc",
+      "E": "Fat-soluble vitamins A and E only"
+    },
+    "correct": "C",
+    "rationale": "The terminal ileum is the specific site of vitamin B12 (intrinsic factor-bound) and bile salt absorption; its resection classically produces deficiencies of both.",
+    "wrong": {
+      "A": "Iron and calcium are absorbed proximally, primarily in the duodenum and proximal jejunum, not the terminal ileum.",
+      "B": "Folate is absorbed in the proximal jejunum, not the terminal ileum.",
+      "D": "Vitamin C and zinc absorption is not localized to the terminal ileum.",
+      "E": "Fat-soluble vitamin malabsorption can occur indirectly from bile salt loss, but the substances directly and specifically absorbed at the terminal ileum are B12 and bile salts."
+    }
+  },
+  {
+    "num": 25,
+    "category": "Nutritional/Vitamin/Metabolic Disorders",
+    "bloom": "Apply",
+    "task": "Pattern recognition",
+    "source": "Lecture 6",
+    "stem": "A 6-year-old child with cystic fibrosis and chronic fat malabsorption presents with difficulty seeing in dim lighting and dry, thickened patches on the conjunctiva. Which of the following vitamin deficiencies is most likely responsible?",
+    "choices": {
+      "A": "Vitamin B12",
+      "B": "Vitamin D",
+      "C": "Vitamin K",
+      "D": "Vitamin E",
+      "E": "Vitamin A"
+    },
+    "correct": "E",
+    "rationale": "Night blindness (nyctalopia) and conjunctival xerosis/Bitot spots are the signature findings of vitamin A deficiency, which occurs with chronic fat malabsorption.",
+    "wrong": {
+      "A": "B12 deficiency causes neurologic and hematologic findings, not night blindness.",
+      "B": "Vitamin D deficiency causes rickets and bone pain, not visual symptoms.",
+      "C": "Vitamin K deficiency causes a bleeding diathesis.",
+      "D": "Vitamin E deficiency causes ataxia and neuropathy, not night blindness or Bitot spots."
+    }
+  },
+  {
+    "num": 26,
+    "category": "Hepatic & Biliary Disorders",
+    "bloom": "Analyze",
+    "task": "Diagnostic / therapeutic selection",
+    "source": "Lecture 5",
+    "stem": "A 50-year-old woman presents with intermittent right upper quadrant pain and jaundice. Labs show total bilirubin 3.5 mg/dL and alkaline phosphatase 380 U/L. Ultrasound shows a dilated common bile duct without evidence of cholecystitis. She is afebrile and hemodynamically stable, without evidence of infection. Which of the following is the most appropriate next step to both confirm and treat the suspected diagnosis?",
+    "choices": {
+      "A": "Observation with repeat ultrasound in 1 week",
+      "B": "Laparoscopic cholecystectomy alone",
+      "C": "Diagnostic laparoscopy",
+      "D": "ERCP",
+      "E": "Oral ursodeoxycholic acid therapy"
+    },
+    "correct": "D",
+    "rationale": "This presentation is consistent with choledocholithiasis. ERCP is both diagnostic and therapeutic, allowing stone extraction and biliary drainage.",
+    "wrong": {
+      "A": "A dilated CBD with cholestatic labs warrants further workup, not simple observation.",
+      "B": "Cholecystectomy alone does not address a retained common bile duct stone.",
+      "C": "Diagnostic laparoscopy does not directly visualize or treat the biliary tree.",
+      "E": "Ursodeoxycholic acid is not indicated for obstructive choledocholithiasis."
+    }
+  },
+  {
+    "num": 27,
+    "category": "Small Bowel & Colonic Disorders",
+    "bloom": "Analyze",
+    "task": "Management",
+    "source": "Lecture 3",
+    "stem": "A 40-year-old man presents with 5 days of worsening right lower quadrant pain, low-grade fever, and a palpable RLQ mass. CT abdomen/pelvis shows a 6-cm periappendiceal abscess with a contained, nonperforated appendix. He is hemodynamically stable. Which of the following is the most appropriate initial management?",
+    "choices": {
+      "A": "Immediate open appendectomy",
+      "B": "Immediate laparoscopic appendectomy",
+      "C": "Diagnostic laparoscopy with peritoneal lavage",
+      "D": "IV antibiotics with percutaneous drainage of the abscess",
+      "E": "Observation without antibiotics or intervention"
+    },
+    "correct": "D",
+    "rationale": "For a stable patient with a delayed presentation and a large, discrete, drainable periappendiceal abscess, initial management is IV antibiotics with percutaneous drainage, with interval appendectomy considered later.",
+    "wrong": {
+      "A": "Immediate surgery is technically difficult and higher risk in the setting of a large, walled-off abscess and is not first-line for this presentation.",
+      "B": "Same limitation as immediate open appendectomy; immediate surgical resection is not the initial step for a contained abscess in a stable patient.",
+      "C": "Diagnostic laparoscopy with lavage is unnecessarily invasive when a discrete, drainable abscess is already identified on imaging.",
+      "E": "An untreated abscess risks progression to sepsis; intervention with antibiotics and drainage is needed."
+    }
+  },
+  {
+    "num": 28,
+    "category": "Stomach & Duodenal Disorders",
+    "bloom": "Apply",
+    "task": "Pharmacotherapy",
+    "source": "Lecture 3",
+    "stem": "A 45-year-old woman is diagnosed with a duodenal ulcer and confirmed H. pylori infection via biopsy. She has no medication allergies and has not been previously treated for H. pylori. Which of the following is the most appropriate first-line treatment regimen?",
+    "choices": {
+      "A": "PPI monotherapy for 8 weeks",
+      "B": "Bismuth quadruple therapy (PPI, bismuth, tetracycline, metronidazole) for 14 days",
+      "C": "Amoxicillin monotherapy for 10 days",
+      "D": "PPI plus clarithromycin dual therapy for 7 days",
+      "E": "H2 blocker monotherapy for 4 weeks"
+    },
+    "correct": "B",
+    "rationale": "For treatment-naive patients with unknown susceptibility, bismuth quadruple therapy (PPI + bismuth + tetracycline + metronidazole) for 14 days is the preferred first-line regimen.",
+    "wrong": {
+      "A": "PPI monotherapy heals the ulcer but does not eradicate H. pylori infection.",
+      "C": "Single-agent antibiotic therapy is insufficient to eradicate H. pylori and promotes resistance.",
+      "D": "Dual PPI plus clarithromycin therapy for 7 days is not a standard regimen; clarithromycin-based therapy has declining efficacy and requires a longer course with additional agents.",
+      "E": "H2 blocker monotherapy does not eradicate H. pylori infection."
+    }
+  },
+  {
+    "num": 29,
+    "category": "Esophageal Disorders",
+    "bloom": "Apply",
+    "task": "Management / surveillance",
+    "source": "Lecture 2",
+    "stem": "A 55-year-old man with a 15-year history of GERD and obesity undergoes upper endoscopy, which reveals salmon-colored mucosa extending into the distal esophagus. Biopsy confirms intestinal metaplasia. Which of the following is the most appropriate next step in management?",
+    "choices": {
+      "A": "Periodic endoscopic surveillance",
+      "B": "Immediate esophagectomy",
+      "C": "No further monitoring is needed once metaplasia is treated with a PPI",
+      "D": "Annual barium esophagram instead of endoscopy",
+      "E": "Radiofrequency ablation regardless of dysplasia grade"
+    },
+    "correct": "A",
+    "rationale": "This patient has Barrett esophagus (intestinal metaplasia) without dysplasia noted, which is managed with periodic endoscopic surveillance to monitor for dysplastic progression.",
+    "wrong": {
+      "B": "Esophagectomy is reserved for high-grade dysplasia or early cancer, not simple nondysplastic Barrett esophagus.",
+      "C": "PPI therapy controls symptoms but does not eliminate metaplastic tissue or the need for surveillance.",
+      "D": "Barium esophagram does not allow biopsy or dysplasia assessment; endoscopic surveillance is the correct modality.",
+      "E": "Ablation is reserved for dysplastic Barrett esophagus, not indicated here since no dysplasia was noted."
+    }
+  },
+  {
+    "num": 30,
+    "category": "Hepatic & Biliary Disorders",
+    "bloom": "Apply",
+    "task": "Management",
+    "source": "Lecture 5",
+    "stem": "A 48-year-old woman with obesity, type 2 diabetes, and hyperlipidemia is found to have mildly elevated liver enzymes on routine labs. Ultrasound shows hepatic steatosis. She denies alcohol use. Which of the following is the most appropriate initial management?",
+    "choices": {
+      "A": "Immediate liver transplant evaluation",
+      "B": "High-dose corticosteroids",
+      "C": "Weight loss through diet and exercise",
+      "D": "Antiviral therapy",
+      "E": "TIPS placement"
+    },
+    "correct": "C",
+    "rationale": "This patient has NAFLD/MASH, associated with obesity, diabetes, and hyperlipidemia. Initial management centers on lifestyle modification, particularly weight loss.",
+    "wrong": {
+      "A": "Transplant evaluation is reserved for decompensated cirrhosis/end-stage liver disease, not early NAFLD.",
+      "B": "Corticosteroids are not indicated for NAFLD/MASH.",
+      "D": "Antiviral therapy treats viral hepatitis, not NAFLD.",
+      "E": "TIPS addresses portal hypertension complications, not initial NAFLD management."
+    }
+  },
+  {
+    "num": 31,
+    "category": "Small Bowel & Colonic Disorders",
+    "bloom": "Apply",
+    "task": "Diagnostic / therapeutic selection",
+    "source": "Lecture 3",
+    "stem": "A 14-month-old boy presents with intermittent episodes of severe abdominal pain during which he draws his knees to his chest and cries, followed by periods of lethargy between episodes. His mother reports a red, jelly-like stool in his diaper. On examination, a sausage-shaped mass is palpated in the right upper quadrant. Which of the following is the most appropriate initial diagnostic and therapeutic intervention?",
+    "choices": {
+      "A": "Upper GI series with small bowel follow-through",
+      "B": "Air or contrast enema",
+      "C": "Exploratory laparotomy",
+      "D": "Colonoscopy",
+      "E": "MRI abdomen"
+    },
+    "correct": "B",
+    "rationale": "This presentation is classic for intussusception. Air or contrast enema is both diagnostic and therapeutic (reduction) in a stable child.",
+    "wrong": {
+      "A": "Upper GI series does not evaluate for or reduce intussusception.",
+      "C": "Surgery is reserved for failed enema reduction, peritonitis, perforation, or an unstable patient, not the initial step in a stable child.",
+      "D": "Colonoscopy is not the standard method for diagnosing or reducing intussusception in this age group.",
+      "E": "MRI is not first-line; it is too slow and not therapeutic in this emergent pediatric presentation."
+    }
+  },
+  {
+    "num": 32,
+    "category": "Pancreatic Disorders",
+    "bloom": "Apply",
+    "task": "Treatment",
+    "source": "Lecture 5",
+    "stem": "A 52-year-old man with a 20-year history of heavy alcohol use presents with chronic epigastric pain, greasy and foul-smelling stools, and new-onset hyperglycemia. CT abdomen shows pancreatic calcifications. Which of the following is the most appropriate treatment for his steatorrhea?",
+    "choices": {
+      "A": "Pancreatic enzyme replacement therapy",
+      "B": "High-dose PPI therapy",
+      "C": "Insulin therapy",
+      "D": "Broad-spectrum antibiotics",
+      "E": "Total pancreatectomy"
+    },
+    "correct": "A",
+    "rationale": "This patient has chronic pancreatitis (calcifications, steatorrhea, diabetes). Pancreatic enzyme replacement therapy treats exocrine insufficiency and steatorrhea.",
+    "wrong": {
+      "B": "PPI does not replace lost exocrine enzyme function and does not directly treat steatorrhea, though it may be used adjunctively to improve enzyme efficacy.",
+      "C": "Insulin addresses his new diabetes (endocrine insufficiency), not the steatorrhea from exocrine insufficiency.",
+      "D": "No infection is indicated in this presentation; antibiotics are not warranted.",
+      "E": "Total pancreatectomy is a drastic, last-resort surgical option, not standard treatment for steatorrhea."
+    }
+  },
+  {
+    "num": 33,
+    "category": "GI Emergencies, Toxicities & Foreign Bodies",
+    "bloom": "Apply",
+    "task": "Pharmacotherapy / toxicology",
+    "source": "Lecture 6",
+    "stem": "A 19-year-old woman is brought to the emergency department 6 hours after intentionally ingesting an unknown quantity of acetaminophen tablets. Her acetaminophen level plotted on the Rumack-Matthew nomogram falls above the treatment line. Which of the following is the most appropriate treatment?",
+    "choices": {
+      "A": "Activated charcoal only, with no further therapy needed",
+      "B": "Hemodialysis as first-line therapy",
+      "C": "IV fomepizole",
+      "D": "Observation only, since she is currently asymptomatic",
+      "E": "N-acetylcysteine"
+    },
+    "correct": "E",
+    "rationale": "A level above the treatment line on the Rumack-Matthew nomogram indicates need for treatment. N-acetylcysteine replenishes glutathione, enabling detoxification of the toxic metabolite NAPQI.",
+    "wrong": {
+      "A": "Charcoal may be adjunctive if given within the appropriate window, but it does not treat established toxicity risk indicated by a level above the treatment line; NAC is required.",
+      "B": "Hemodialysis is reserved for select severe cases, not first-line therapy.",
+      "C": "Fomepizole is used for toxic alcohol ingestions (methanol, ethylene glycol), not acetaminophen toxicity.",
+      "D": "A level above the treatment line requires treatment regardless of current symptoms; hepatotoxicity can develop despite an asymptomatic early presentation."
+    }
+  },
+  {
+    "num": 34,
+    "category": "Hepatic & Biliary Disorders",
+    "bloom": "Apply",
+    "task": "Pathophysiology / natural history",
+    "source": "Lecture 5",
+    "stem": "A 35-year-old man who reports a history of IV drug use is found to have persistently elevated liver enzymes for the past 8 months. Serologic testing reveals anti-HCV antibody positivity with detectable HCV RNA. Which of the following best describes the expected natural history of this infection if untreated?",
+    "choices": {
+      "A": "Greater than 90% of adults clear the virus spontaneously without treatment",
+      "B": "Chronic hepatitis can occur in as high as 85% of patients with acute hepatitis C",
+      "C": "Chronic infection occurs only in immunocompromised patients",
+      "D": "A vaccine is available to prevent this infection",
+      "E": "This virus requires hepatitis D co-infection to cause chronic liver disease"
+    },
+    "correct": "B",
+    "rationale": "Hepatitis C has a high propensity for chronicity, occurring in as high as 85% of patients with acute infection, eventually leading to cirrhosis and increased hepatocellular carcinoma risk.",
+    "wrong": {
+      "A": "This describes the typical course of hepatitis A, not hepatitis C; most adults do not spontaneously clear HCV.",
+      "C": "Chronicity occurs regardless of immune status; it is not exclusive to immunocompromised patients.",
+      "D": "No vaccine currently exists for hepatitis C, unlike hepatitis A and B.",
+      "E": "Hepatitis D requires HBV co-infection or superinfection, not HCV, to cause disease."
+    }
+  },
+  {
+    "num": 35,
+    "category": "Small Bowel & Colonic Disorders",
+    "bloom": "Apply",
+    "task": "Management",
+    "source": "Lecture 4",
+    "stem": "A 29-year-old woman reports 8 months of recurrent abdominal pain associated with alternating constipation and diarrhea, relieved with defecation. Workup including colonoscopy and celiac serologies is unremarkable. Which of the following is the most appropriate initial management approach?",
+    "choices": {
+      "A": "Long-term opioid therapy for pain control",
+      "B": "Empiric antibiotic therapy",
+      "C": "Symptom-directed therapy based on predominant bowel pattern",
+      "D": "Total colectomy",
+      "E": "Chronic corticosteroid therapy"
+    },
+    "correct": "C",
+    "rationale": "This presentation is consistent with irritable bowel syndrome after a negative structural workup. Management is symptom-directed based on the predominant bowel habit subtype.",
+    "wrong": {
+      "A": "Opioids are not appropriate long-term IBS therapy and risk dependence and worsening constipation.",
+      "B": "Antibiotics are not the general first-line approach for IBS.",
+      "D": "Colectomy is not indicated for a functional disorder with a normal structural workup.",
+      "E": "Corticosteroids are used for inflammatory conditions such as IBD, not indicated here given a normal workup."
+    }
+  },
+  {
+    "num": 36,
+    "category": "Abdominal Wall Hernias",
+    "bloom": "Apply",
+    "task": "Diagnosis / anatomy",
+    "source": "Lecture 6",
+    "stem": "On physical examination of a 45-year-old man with a groin bulge, the mass is noted to protrude lateral to the inferior epigastric vessels and follows the path of the spermatic cord into the scrotum. Which of the following is the most likely diagnosis?",
+    "choices": {
+      "A": "Indirect inguinal hernia",
+      "B": "Direct inguinal hernia",
+      "C": "Femoral hernia",
+      "D": "Umbilical hernia",
+      "E": "Obturator hernia"
+    },
+    "correct": "A",
+    "rationale": "Indirect inguinal hernias traverse the internal inguinal ring lateral to the inferior epigastric vessels and follow the spermatic cord, often extending into the scrotum, related to a patent processus vaginalis.",
+    "wrong": {
+      "B": "Direct hernias protrude medial to the inferior epigastric vessels through Hesselbach triangle.",
+      "C": "Femoral hernias occur below the inguinal ligament, medial to the femoral vessels.",
+      "D": "Umbilical hernias occur at the umbilicus, unrelated to inguinal canal anatomy.",
+      "E": "Obturator hernias are rare pelvic floor hernias, not groin bulges following the spermatic cord."
+    }
+  },
+  {
+    "num": 37,
+    "category": "Esophageal Disorders",
+    "bloom": "Apply",
+    "task": "Diagnostic selection",
+    "source": "Lecture 2",
+    "stem": "An 82-year-old man reports several months of halitosis, regurgitation of undigested food hours after eating, and occasional coughing at night. He denies odynophagia. Which of the following is the most appropriate initial diagnostic test?",
+    "choices": {
+      "A": "Upper endoscopy",
+      "B": "High-resolution manometry",
+      "C": "Barium esophagram",
+      "D": "24-hour pH monitoring",
+      "E": "CT chest with contrast"
+    },
+    "correct": "C",
+    "rationale": "This presentation suggests Zenker diverticulum. Barium esophagram is the preferred initial test, as blind endoscope passage carries a perforation risk in this condition.",
+    "wrong": {
+      "A": "Endoscopy carries a risk of perforation in suspected Zenker diverticulum if not anticipated and is not the preferred initial test.",
+      "B": "Manometry evaluates motility disorders, not structural outpouchings.",
+      "D": "pH monitoring assesses reflux and is not relevant to this presentation.",
+      "E": "CT chest is not the first-line test for a suspected pharyngoesophageal diverticulum."
+    }
+  },
+  {
+    "num": 38,
+    "category": "GI Emergencies, Toxicities & Foreign Bodies",
+    "bloom": "Apply",
+    "task": "Emergency management",
+    "source": "Lecture 6",
+    "stem": "A 2-year-old girl is brought to the emergency department after her mother witnessed her swallow a small, round, shiny object from a remote control approximately 1 hour ago. She is asymptomatic. X-ray confirms a radiopaque disc-shaped object lodged in the mid-esophagus. Which of the following is the most appropriate next step?",
+    "choices": {
+      "A": "Discharge home with instructions to monitor stool for passage",
+      "B": "Repeat X-ray in 24 hours to assess for movement into the stomach",
+      "C": "Administer activated charcoal",
+      "D": "Emergent endoscopic removal",
+      "E": "Administer an emetic agent to induce vomiting"
+    },
+    "correct": "D",
+    "rationale": "An esophageal button battery is a true emergency; liquefactive necrosis begins within 2 hours. It requires emergent endoscopic removal regardless of the patient's current symptom status.",
+    "wrong": {
+      "A": "Esophageal button batteries cannot be observed for spontaneous passage given the risk of rapid tissue injury.",
+      "B": "Delaying imaging/removal risks worsening tissue injury and fistula formation; this requires emergent action, not watchful waiting.",
+      "C": "Activated charcoal is not effective or indicated for a battery, a foreign object.",
+      "E": "Inducing emesis is not appropriate for esophageal foreign body removal and risks aspiration."
+    }
+  },
+  {
+    "num": 39,
+    "category": "Stomach & Duodenal Disorders",
+    "bloom": "Apply",
+    "task": "Pharmacotherapy",
+    "source": "Lecture 3",
+    "stem": "A 34-year-old woman with a 10-year history of poorly controlled type 1 diabetes presents with early satiety, postprandial bloating, nausea, and occasional vomiting of undigested food eaten hours earlier. Upper endoscopy is unremarkable. Which of the following is the most appropriate initial pharmacologic treatment?",
+    "choices": {
+      "A": "Omeprazole",
+      "B": "Ondansetron monotherapy",
+      "C": "Metoclopramide",
+      "D": "Loperamide",
+      "E": "Dicyclomine"
+    },
+    "correct": "C",
+    "rationale": "This presentation is consistent with diabetic gastroparesis. Metoclopramide, a prokinetic agent (dopamine D2 antagonist/5-HT4 agonist), is the only FDA-approved medication for gastroparesis and accelerates gastric emptying.",
+    "wrong": {
+      "A": "PPI addresses acid-related symptoms, not delayed gastric emptying.",
+      "B": "Ondansetron treats nausea symptomatically but does not address the underlying motility disorder.",
+      "D": "Loperamide slows motility further, which would worsen gastroparesis.",
+      "E": "Dicyclomine is an antispasmodic used for conditions such as IBS and could worsen motility in gastroparesis."
+    }
+  },
+  {
+    "num": 40,
+    "category": "Colorectal & Perianal Disorders",
+    "bloom": "Apply",
+    "task": "Screening / health maintenance",
+    "source": "Lecture 4",
+    "stem": "A 45-year-old man with no family history of colorectal cancer and no gastrointestinal symptoms presents for a routine health maintenance visit. Which of the following is the most appropriate recommendation regarding colorectal cancer screening?",
+    "choices": {
+      "A": "Begin screening now with colonoscopy or annual FIT testing",
+      "B": "Delay screening until age 50",
+      "C": "Screening is unnecessary without a family history",
+      "D": "Begin screening only if symptoms develop",
+      "E": "Screen with CEA level annually"
+    },
+    "correct": "A",
+    "rationale": "Average-risk colorectal cancer screening begins at age 45, using colonoscopy every 10 years or annual FIT testing.",
+    "wrong": {
+      "B": "Average-risk screening begins at age 45, not 50.",
+      "C": "Average-risk screening is recommended for all patients starting at 45, regardless of family history.",
+      "D": "Screening is meant to detect asymptomatic disease and precursor polyps, not to wait for symptom development.",
+      "E": "CEA is not a screening test; it has poor sensitivity and specificity for this purpose."
+    }
+  },
+  {
+    "num": 41,
+    "category": "Nutritional/Vitamin/Metabolic Disorders",
+    "bloom": "Apply",
+    "task": "Pathophysiology",
+    "source": "Lecture 6",
+    "stem": "A 6-year-old boy develops diffuse urticaria, lip swelling, and wheezing within minutes of eating peanut butter. Which of the following best describes the mechanism underlying this reaction?",
+    "choices": {
+      "A": "Enzymatic deficiency preventing digestion of a specific carbohydrate",
+      "B": "Direct toxic effect of a food component on the intestinal mucosa",
+      "C": "IgE-mediated immune response to a food protein",
+      "D": "Osmotic diarrhea from unabsorbed sugar",
+      "E": "Nonimmune pharmacologic reaction to a food additive"
+    },
+    "correct": "C",
+    "rationale": "Rapid-onset urticaria, angioedema, and wheezing after food exposure represent an IgE-mediated allergic reaction to a food protein, distinct from nonimmune food intolerance.",
+    "wrong": {
+      "A": "This describes an enzymatic intolerance (e.g., lactase deficiency), not an acute allergic reaction.",
+      "B": "This describes toxin-mediated food poisoning, not an allergic mechanism.",
+      "D": "This describes an intolerance mechanism (e.g., lactose intolerance), not a rapid-onset IgE-mediated allergic reaction.",
+      "E": "This describes a pharmacologic/nonimmune reaction (e.g., to caffeine or tyramine), not true food allergy."
+    }
+  },
+  {
+    "num": 42,
+    "category": "Integrated / Cross-Category",
+    "bloom": "Analyze",
+    "task": "Management (integration)",
+    "source": "Lecture 4 + Lecture 6",
+    "stem": "A 70-year-old man presents with nausea, vomiting, and obstipation for 24 hours. Abdominal CT shows dilated loops of small bowel with a transition point at a tender, nonreducible bulge in the right groin. Which of the following is the most appropriate next step in management?",
+    "choices": {
+      "A": "Nasogastric decompression and observation alone",
+      "B": "Trial of manual reduction, then discharge if successful",
+      "C": "IV antibiotics with outpatient hernia repair in 6 weeks",
+      "D": "Emergency surgical exploration and hernia repair",
+      "E": "Colonoscopy to evaluate for a proximal mass"
+    },
+    "correct": "D",
+    "rationale": "This is a hernia-related complete mechanical small bowel obstruction with a nonreducible, tender groin mass, raising concern for incarceration/strangulation. This requires emergency surgical exploration and repair; hernia-related obstruction is almost always complete and cannot be managed conservatively.",
+    "wrong": {
+      "A": "Observation alone is inadequate; a nonreducible hernia causing complete mechanical obstruction requires surgical intervention.",
+      "B": "Attempting reduction of a possibly strangulated/ischemic hernia risks returning necrotic bowel into the abdomen and is not recommended when signs suggest a surgical emergency.",
+      "C": "Delaying definitive repair with only antibiotics risks progression to bowel necrosis or perforation.",
+      "E": "Colonoscopy does not address the mechanical obstruction caused by the incarcerated hernia and is not the correct next step."
+    }
+  },
+  {
+    "num": 43,
+    "category": "Stomach & Duodenal Disorders",
+    "bloom": "Analyze",
+    "task": "Pathophysiology / anatomy correlation",
+    "source": "Lecture 3",
+    "stem": "A 60-year-old man with a known duodenal ulcer develops sudden hematemesis and hypotension. Endoscopy identifies a posterior duodenal ulcer with active bleeding. Which of the following vessels is most likely the source of this hemorrhage?",
+    "choices": {
+      "A": "Splenic artery",
+      "B": "Gastroduodenal artery",
+      "C": "Left gastric artery",
+      "D": "Superior mesenteric artery",
+      "E": "Inferior pancreaticoduodenal vein"
+    },
+    "correct": "B",
+    "rationale": "Posterior duodenal ulcers classically erode into the gastroduodenal artery, causing massive hemorrhage. (Anterior duodenal ulcers are more likely to perforate instead.)",
+    "wrong": {
+      "A": "Splenic artery erosion is associated with posterior gastric ulcers, not duodenal ulcers.",
+      "C": "The left gastric artery is not the classic vessel implicated in posterior duodenal ulcer hemorrhage.",
+      "D": "SMA involvement is associated with mesenteric ischemia, not typical PUD-related bleeding.",
+      "E": "Venous erosion is not the mechanism responsible for the massive arterial hemorrhage described here."
+    }
+  },
+  {
+    "num": 44,
+    "category": "Nutritional/Vitamin/Metabolic Disorders",
+    "bloom": "Apply",
+    "task": "Pathophysiology / complication",
+    "source": "Lecture 6",
+    "stem": "A newborn has a positive newborn screen for elevated phenylalanine levels. If untreated, which of the following complications is this infant at greatest risk for?",
+    "choices": {
+      "A": "Rickets",
+      "B": "Megaloblastic anemia",
+      "C": "Bleeding diathesis",
+      "D": "Night blindness",
+      "E": "Intellectual disability"
+    },
+    "correct": "E",
+    "rationale": "This infant has phenylketonuria (PKU). Untreated accumulation of phenylalanine is neurotoxic and, if not managed with a lifelong phenylalanine-restricted diet, causes progressive intellectual disability.",
+    "wrong": {
+      "A": "Rickets results from vitamin D deficiency, not PKU.",
+      "B": "Megaloblastic anemia results from B12/folate deficiency, not PKU.",
+      "C": "Bleeding diathesis results from vitamin K deficiency, not PKU.",
+      "D": "Night blindness results from vitamin A deficiency, not PKU."
+    }
+  },
+  {
+    "num": 45,
+    "category": "GI Emergencies, Toxicities & Foreign Bodies",
+    "bloom": "Apply",
+    "task": "Emergency management sequencing",
+    "source": "Lecture 2/3",
+    "stem": "A 66-year-old man with a history of NSAID use presents with melena and lightheadedness. His heart rate is 128 beats/min and blood pressure is 78/46 mm Hg. Which of the following is the most appropriate immediate next step?",
+    "choices": {
+      "A": "Emergent upper endoscopy within 15 minutes",
+      "B": "Administer oral PPI and observe",
+      "C": "Immediate CT angiography",
+      "D": "Colonoscopy to localize the bleeding source",
+      "E": "Establish large-bore IV access and begin fluid resuscitation"
+    },
+    "correct": "E",
+    "rationale": "In a hemodynamically unstable patient with suspected upper GI bleeding, hemodynamic stabilization (large-bore IV access, fluid/blood resuscitation) precedes endoscopic evaluation.",
+    "wrong": {
+      "A": "Endoscopy is important but should follow initial hemodynamic stabilization, not precede it in a hypotensive, tachycardic patient.",
+      "B": "Oral PPI is inadequate for an unstable, actively bleeding patient; resuscitation must occur first.",
+      "C": "CT angiography is not the first step for suspected upper GI bleed with melena and hemodynamic instability.",
+      "D": "Colonoscopy is used for suspected lower GI sources and still requires stabilization first; melena suggests an upper source in this vignette."
+    }
+  },
+  {
+    "num": 46,
+    "category": "Pancreatic Disorders",
+    "bloom": "Apply",
+    "task": "Diagnostic selection",
+    "source": "Lecture 5",
+    "stem": "A 68-year-old man presents with 2 months of painless jaundice, dark urine, pale stools, and a 15-pound unintentional weight loss. Which of the following is the most appropriate initial imaging study?",
+    "choices": {
+      "A": "Abdominal ultrasound only, with no further imaging needed",
+      "B": "MRCP as the definitive diagnostic test",
+      "C": "ERCP as the initial diagnostic step",
+      "D": "Contrast-enhanced CT abdomen",
+      "E": "Abdominal X-ray"
+    },
+    "correct": "D",
+    "rationale": "Painless jaundice with weight loss raises concern for pancreatic malignancy. Contrast-enhanced CT abdomen is the key initial diagnostic and staging study.",
+    "wrong": {
+      "A": "Ultrasound may be used to begin a jaundice workup, but definitive evaluation and staging require CT.",
+      "B": "MRCP can be useful, but contrast-enhanced CT is the primary initial diagnostic/staging study for this presentation.",
+      "C": "ERCP is more invasive and typically used therapeutically for biliary drainage once a diagnosis is suspected, not as the primary initial imaging test.",
+      "E": "Plain radiography has no role in evaluating a suspected pancreatic mass."
+    }
+  },
+  {
+    "num": 47,
+    "category": "Abdominal Wall Hernias",
+    "bloom": "Apply",
+    "task": "Diagnosis",
+    "source": "Lecture 6",
+    "stem": "A 60-year-old woman with long-standing GERD symptoms is found on upper endoscopy to have displacement of the gastroesophageal junction above the diaphragm. Which of the following is the most likely diagnosis?",
+    "choices": {
+      "A": "Zenker diverticulum",
+      "B": "Hiatal hernia",
+      "C": "Achalasia",
+      "D": "Boerhaave syndrome",
+      "E": "Schatzki ring"
+    },
+    "correct": "B",
+    "rationale": "Displacement of the gastroesophageal junction above the diaphragm describes a hiatal hernia, which disrupts the anti-reflux barrier and commonly contributes to GERD.",
+    "wrong": {
+      "A": "Zenker diverticulum is a pharyngoesophageal outpouching, unrelated to GE junction displacement.",
+      "C": "Achalasia is a motility disorder, not an anatomic herniation.",
+      "D": "Boerhaave syndrome is an acute esophageal rupture/emergency, not a chronic GERD-associated finding.",
+      "E": "Schatzki ring is a mucosal ring at the GE junction associated with intermittent solid food dysphagia, not displacement of the GE junction itself."
+    }
+  },
+  {
+    "num": 48,
+    "category": "Colorectal & Perianal Disorders",
+    "bloom": "Apply",
+    "task": "Diagnosis / classification",
+    "source": "Lecture 4",
+    "stem": "A 50-year-old man reports painless bright red blood coating his stool and a sensation of a mass that protrudes during defecation but requires him to push it back in manually. Anoscopy confirms an internal hemorrhoid. Which of the following grades best describes this presentation?",
+    "choices": {
+      "A": "Grade III",
+      "B": "Grade I",
+      "C": "Grade II",
+      "D": "Grade IV",
+      "E": "External hemorrhoid grade II"
+    },
+    "correct": "A",
+    "rationale": "Prolapse with defecation that requires manual reduction is characteristic of a Grade III internal hemorrhoid.",
+    "wrong": {
+      "B": "Grade I hemorrhoids bulge into the lumen but do not prolapse below the dentate line; no protrusion is described in Grade I.",
+      "C": "Grade II hemorrhoids prolapse with straining but reduce spontaneously, without requiring manual reduction.",
+      "D": "Grade IV hemorrhoids are irreducible even with manual attempts.",
+      "E": "External hemorrhoids are not classified using this internal hemorrhoid grading system, and anoscopy in this vignette confirmed an internal hemorrhoid."
+    }
+  },
+  {
+    "num": 49,
+    "category": "GI Anatomy & Physiology",
+    "bloom": "Understand",
+    "task": "Diagnostic test selection / function",
+    "source": "Lecture 1",
+    "stem": "A 55-year-old man presents with dysphagia. His physician wants to assess for a subtle mucosal ring and also needs the ability to obtain tissue biopsies to evaluate for malignancy. Which of the following diagnostic tests provides direct visualization along with the ability to obtain biopsies?",
+    "choices": {
+      "A": "Barium esophagram",
+      "B": "Esophageal manometry",
+      "C": "24-hour pH monitoring",
+      "D": "Chest X-ray",
+      "E": "Upper endoscopy (EGD)"
+    },
+    "correct": "E",
+    "rationale": "EGD allows direct visualization of the esophageal mucosa along with the ability to obtain biopsies, distinguishing it from purely structural or functional tests.",
+    "wrong": {
+      "A": "Barium esophagram shows contour, motility, and strictures but does not allow biopsy.",
+      "B": "Manometry assesses motor function, not mucosal visualization or biopsy.",
+      "C": "pH monitoring assesses acid exposure, not structural or mucosal evaluation.",
+      "D": "Chest X-ray has no role in direct esophageal mucosal evaluation or biopsy."
+    }
+  },
+  {
+    "num": 50,
+    "category": "Integrated / Cross-Category",
+    "bloom": "Analyze",
+    "task": "Clinical comparison / judgment",
+    "source": "Lecture 4 + Lecture 5",
+    "stem": "Which of the following clinical presentations most strongly suggests bowel ischemia requiring emergent surgical evaluation, as opposed to a condition that can typically be managed with supportive care alone?",
+    "choices": {
+      "A": "Severe abdominal pain out of proportion to physical examination findings in a patient with atrial fibrillation",
+      "B": "Mild, diffuse abdominal discomfort with active bowel sounds in a postoperative patient",
+      "C": "Episodic postprandial right upper quadrant pain relieved by avoiding fatty foods",
+      "D": "Intermittent lower abdominal cramping relieved by defecation",
+      "E": "Dull epigastric pain radiating to the back that improves with leaning forward"
+    },
+    "correct": "A",
+    "rationale": "Severe pain out of proportion to examination findings, particularly with an embolic risk factor such as atrial fibrillation, is the classic presentation of acute mesenteric ischemia, a true surgical emergency requiring rapid diagnosis and revascularization.",
+    "wrong": {
+      "B": "This describes a typical postoperative ileus picture, generally managed with supportive care.",
+      "C": "This describes biliary colic, managed based on symptomatic gallstone disease, not an emergent ischemic process.",
+      "D": "This describes IBS-type symptoms, a functional disorder managed conservatively.",
+      "E": "This describes a typical pancreatitis pain pattern, initially managed with supportive care (fluids, pain control) rather than emergent surgery in the absence of complications."
+    }
+  }
+]
+</script>
+
+<script>
+const DATA = JSON.parse(document.getElementById('examData').textContent);
+const state = {}; // num -> {selected, submitted, struck:Set}
+
+function el(tag, cls, html){
+  const e = document.createElement(tag);
+  if(cls) e.className = cls;
+  if(html !== undefined) e.innerHTML = html;
+  return e;
+}
+
+function buildJumpNav(){
+  const nav = document.getElementById('jumpnav');
+  DATA.forEach(q=>{
+    const a = el('a', '', q.num);
+    a.href = '#q' + q.num;
+    a.id = 'jump' + q.num;
+    nav.appendChild(a);
+  });
+}
+
+function renderQuestion(q){
+  const card = el('div', 'qcard');
+  card.id = 'q' + q.num;
+
+  const meta = el('div', 'qmeta');
+  meta.appendChild(el('span','badge cat', q.category));
+  meta.appendChild(el('span','badge', q.bloom + ' · ' + q.task));
+  card.appendChild(meta);
+
+  const stem = el('div','stem');
+  stem.innerHTML = '<span class="qnum">Q' + q.num + '.</span> ' + q.stem;
+  card.appendChild(stem);
+
+  const lettersOrder = ['A','B','C','D','E'];
+  lettersOrder.forEach(L=>{
+    const row = el('label','choice');
+    row.id = 'q'+q.num+'_choice_'+L;
+    const radio = document.createElement('input');
+    radio.type = 'radio';
+    radio.name = 'q'+q.num;
+    radio.value = L;
+    radio.onchange = ()=>selectChoice(q.num, L);
+    row.appendChild(radio);
+    row.appendChild(el('span','letter', L + '.'));
+    row.appendChild(el('span','ctext', q.choices[L]));
+    const strikeBtn = el('button','strike-btn','⌀');
+    strikeBtn.type='button';
+    strikeBtn.title='Cross out this choice';
+    strikeBtn.onclick = (ev)=>{ ev.preventDefault(); ev.stopPropagation(); toggleStrike(q.num, L); };
+    row.appendChild(strikeBtn);
+    card.appendChild(row);
+  });
+
+  const actions = el('div','qactions');
+  const checkBtn = el('button','btn-check','Check Answer');
+  checkBtn.id = 'check'+q.num;
+  checkBtn.disabled = true;
+  checkBtn.onclick = ()=>submitAnswer(q.num);
+  actions.appendChild(checkBtn);
+  const flag = el('span','result-flag');
+  flag.id = 'flag'+q.num;
+  actions.appendChild(flag);
+  card.appendChild(actions);
+
+  const fb = el('div','feedback');
+  fb.id = 'fb'+q.num;
+  let fbHtml = '<h4>Correct answer: ' + q.correct + '</h4>';
+  fbHtml += '<div class="rationale">' + q.rationale + '</div>';
+  fbHtml += '<h4>Why the other options are incorrect</h4>';
+  lettersOrder.filter(L=>L!==q.correct).forEach(L=>{
+    fbHtml += '<div class="wrong-explain"><b>' + L + '.</b> ' + q.wrong[L] + '</div>';
+  });
+  fbHtml += '<div class="metarow">' +
+    '<span><b>Blueprint category:</b> ' + q.category + '</span>' +
+    '<span><b>Bloom level:</b> ' + q.bloom + '</span>' +
+    '<span><b>Task tested:</b> ' + q.task + '</span>' +
+    '<span><b>Source:</b> ' + q.source + '</span>' +
+    '</div>';
+  fb.innerHTML = fbHtml;
+  card.appendChild(fb);
+
+  return card;
+}
+
+function selectChoice(num, letter){
+  state[num] = state[num] || {selected:null, submitted:false, struck:new Set()};
+  state[num].selected = letter;
+  document.getElementById('check'+num).disabled = false;
+  ['A','B','C','D','E'].forEach(L=>{
+    document.getElementById('q'+num+'_choice_'+L).classList.toggle('selected', L===letter);
+  });
+  updateStats();
+}
+
+function toggleStrike(num, letter){
+  state[num] = state[num] || {selected:null, submitted:false, struck:new Set()};
+  const s = state[num].struck;
+  const rowEl = document.getElementById('q'+num+'_choice_'+letter);
+  if(s.has(letter)){ s.delete(letter); rowEl.classList.remove('struck'); }
+  else { s.add(letter); rowEl.classList.add('struck'); }
+}
+
+function submitAnswer(num){
+  const q = DATA.find(x=>x.num===num);
+  const st = state[num];
+  if(!st || !st.selected) return;
+  st.submitted = true;
+  const isCorrect = st.selected === q.correct;
+  ['A','B','C','D','E'].forEach(L=>{
+    const rowEl = document.getElementById('q'+num+'_choice_'+L);
+    if(L === q.correct) rowEl.classList.add('correct-reveal');
+    else if(L === st.selected) rowEl.classList.add('wrong-reveal');
+    rowEl.querySelector('input').disabled = true;
+    rowEl.querySelector('.strike-btn').disabled = true;
+  });
+  const flag = document.getElementById('flag'+num);
+  flag.textContent = isCorrect ? 'Correct' : 'Incorrect';
+  flag.className = 'result-flag ' + (isCorrect ? 'correct':'incorrect');
+  document.getElementById('fb'+num).classList.add('show');
+  document.getElementById('check'+num).disabled = true;
+  const jump = document.getElementById('jump'+num);
+  jump.classList.add(isCorrect ? 'answered' : 'wronged');
+  updateStats();
+}
+
+function updateStats(){
+  const answered = Object.values(state).filter(s=>s.selected).length;
+  document.getElementById('statsLine').textContent = answered + ' / 50 answered';
+}
+
+function submitFullExam(){
+  // auto-check any answered-but-not-submitted, then show summary
+  DATA.forEach(q=>{
+    const st = state[q.num];
+    if(st && st.selected && !st.submitted){
+      submitAnswer(q.num);
+    }
+  });
+  const submittedCount = Object.values(state).filter(s=>s.submitted).length;
+  const correctCount = DATA.filter(q=>{
+    const st = state[q.num];
+    return st && st.submitted && st.selected === q.correct;
+  }).length;
+
+  const catStats = {};
+  DATA.forEach(q=>{
+    catStats[q.category] = catStats[q.category] || {total:0, correct:0, answered:0};
+    catStats[q.category].total++;
+    const st = state[q.num];
+    if(st && st.submitted){
+      catStats[q.category].answered++;
+      if(st.selected === q.correct) catStats[q.category].correct++;
+    }
+  });
+
+  const box = document.getElementById('summaryBox');
+  box.classList.add('show');
+  const pct = submittedCount ? Math.round(100*correctCount/submittedCount) : 0;
+  document.getElementById('summaryScore').innerHTML =
+    '<div style="font-size:1.6rem; font-weight:700;">' + correctCount + ' / ' + submittedCount + ' correct (' + pct + '%)</div>' +
+    '<div style="font-size:0.85rem; opacity:0.85;">' + (50-submittedCount) + ' question(s) left unanswered</div>';
+  document.getElementById('scorebarFill').style.width = pct + '%';
+
+  let tbl = '<tr><th>Blueprint Category</th><th>Correct</th><th>Answered</th><th>Total</th></tr>';
+  Object.keys(catStats).forEach(cat=>{
+    const c = catStats[cat];
+    tbl += '<tr><td>'+cat+'</td><td>'+c.correct+'</td><td>'+c.answered+'</td><td>'+c.total+'</td></tr>';
+  });
+  document.getElementById('summaryTable').innerHTML = tbl;
+  box.scrollIntoView({behavior:'smooth'});
+}
+
+document.getElementById('btnSubmitExam').onclick = submitFullExam;
+
+function init(){
+  buildJumpNav();
+  const container = document.getElementById('examContainer');
+  DATA.forEach(q=>{
+    container.appendChild(renderQuestion(q));
+  });
+  updateStats();
+}
+init();
+</script>
+
+</body>
+</html>
