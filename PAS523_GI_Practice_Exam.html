@@ -99,29 +99,34 @@
   #summaryBox td, #summaryBox th{padding:5px 8px; border-bottom:1px solid rgba(255,255,255,0.2); text-align:left;}
   .scorebar{background:rgba(255,255,255,0.15); border-radius:6px; height:10px; overflow:hidden; margin-top:6px;}
   .scorebar-fill{background:#4fd1a5; height:100%;}
+  body.has-sidebar{margin-left:76px;}
   #jumpnav{
-    display:flex; flex-wrap:wrap; gap:4px; margin:14px 24px 0; max-width:880px;
+    position:fixed; top:0; left:0; bottom:0; width:76px; overflow-y:auto;
+    background:#fff; border-right:1px solid var(--border); z-index:40;
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    padding:14px 8px 24px;
+  }
+  #jumpnav .navlabel{
+    font-size:0.65rem; font-weight:700; letter-spacing:0.05em; color:var(--muted);
+    text-transform:uppercase; margin-bottom:4px; text-align:center;
   }
   #jumpnav a{
-    width:26px; height:26px; display:flex; align-items:center; justify-content:center;
+    width:32px; height:26px; display:flex; align-items:center; justify-content:center;
     font-size:0.7rem; border-radius:5px; border:1px solid var(--border); color:var(--navy);
-    text-decoration:none; background:#fff;
+    text-decoration:none; background:#fff; flex-shrink:0;
   }
+  #jumpnav a:hover{background:#eef2f7;}
   #jumpnav a.answered{background:#dfeee3; border-color:var(--correct);}
   #jumpnav a.wronged{background:#fbe4e1; border-color:var(--wrong);}
 </style>
 </head>
-<body>
+<body class="has-sidebar">
 
 <header class="exam-header">
   <h1>PAS-523 Clinical Medicine II — GI Practice Exam</h1>
   <p>50 questions · Weighted per the Final GI Exam Blueprint</p>
   <p>Prepared for Mercedas · Exam IV GI Block</p>
 </header>
-
-<div class="disclaimer">
-  <b>How this exam was built:</b> All medical facts, diagnostic criteria, and management steps are drawn directly from your six uploaded GI lecture decks. Topic weighting and emphasis follow your <i>Final Weighted GI Exam Blueprint</i>. Blueprint tier predictions and faculty-emphasis guesses are the professor's/blueprint's stated predictions, not confirmed exam content — treat them as study prioritization, not leaked material.
-</div>
 
 <div class="toolbar">
   <div class="stats" id="statsLine">0 / 50 answered</div>
@@ -1316,6 +1321,7 @@ function el(tag, cls, html){
 
 function buildJumpNav(){
   const nav = document.getElementById('jumpnav');
+  nav.appendChild(el('div','navlabel','Questions'));
   DATA.forEach(q=>{
     const a = el('a', '', q.num);
     a.href = '#q' + q.num;
@@ -1327,11 +1333,6 @@ function buildJumpNav(){
 function renderQuestion(q){
   const card = el('div', 'qcard');
   card.id = 'q' + q.num;
-
-  const meta = el('div', 'qmeta');
-  meta.appendChild(el('span','badge cat', q.category));
-  meta.appendChild(el('span','badge', q.bloom + ' · ' + q.task));
-  card.appendChild(meta);
 
   const stem = el('div','stem');
   stem.innerHTML = '<span class="qnum">Q' + q.num + '.</span> ' + q.stem;
