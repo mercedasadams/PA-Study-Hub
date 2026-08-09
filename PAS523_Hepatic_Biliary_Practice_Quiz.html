@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PAS-523 Clinical Medicine II — GI Practice Exam</title>
+<style>
+  :root{
+    --navy:#0f2b46; --navy-light:#1c3f61; --accent:#0e7c86; --accent2:#b5651d;
+    --bg:#f6f7f9; --card:#ffffff; --border:#dde3ea; --text:#1b2430; --muted:#5a6572;
+    --correct:#1c7c3c; --correct-bg:#e7f6ec; --wrong:#b3261e; --wrong-bg:#fdecea;
+    --tier1:#8a1c1c;
+  }
+  *{box-sizing:border-box;}
+  body{
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background:var(--bg); color:var(--text); margin:0; padding:0; line-height:1.5;
+  }
+  header.exam-header{
+    background:linear-gradient(135deg,var(--navy),var(--navy-light));
+    color:#fff; padding:28px 24px;
+  }
+  header.exam-header h1{margin:0 0 6px; font-size:1.5rem;}
+  header.exam-header p{margin:2px 0; font-size:0.92rem; opacity:0.92;}
+  .disclaimer{
+    background:#fff8e6; border:1px solid #e8cf8a; color:#5c4a12; padding:12px 16px;
+    margin:16px 24px; border-radius:8px; font-size:0.85rem;
+  }
+  .toolbar{
+    position:sticky; top:0; z-index:50; background:#fff; border-bottom:1px solid var(--border);
+    padding:10px 24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;
+  }
+  .toolbar .stats{font-size:0.88rem; color:var(--muted);}
+  .toolbar button{
+    background:var(--navy); color:#fff; border:none; padding:8px 14px; border-radius:6px;
+    font-size:0.85rem; cursor:pointer;
+  }
+  .toolbar button.secondary{background:#fff; color:var(--navy); border:1px solid var(--navy);}
+  .toolbar button:hover{opacity:0.88;}
+  main{max-width:880px; margin:0 auto; padding:20px 16px 80px;}
+  .qcard{
+    background:var(--card); border:1px solid var(--border); border-radius:10px;
+    padding:18px 20px; margin-bottom:18px; scroll-margin-top:70px;
+  }
+  .qmeta{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px;}
+  .badge{
+    font-size:0.7rem; font-weight:600; padding:3px 9px; border-radius:20px; letter-spacing:0.02em;
+    background:#eef2f7; color:var(--navy); border:1px solid #d7e0ea;
+  }
+  .badge.cat{background:#e8f2f2; color:var(--accent); border-color:#cfe6e6;}
+  .qnum{font-weight:700; color:var(--navy);}
+  .stem{margin:10px 0 14px; font-size:0.98rem;}
+  .choice{
+    display:flex; align-items:flex-start; gap:10px; padding:9px 10px; border:1px solid var(--border);
+    border-radius:8px; margin-bottom:8px; cursor:pointer; transition:background 0.12s;
+  }
+  .choice:hover{background:#f4f7fa;}
+  .choice input[type=radio]{margin-top:3px;}
+  .choice .letter{font-weight:700; color:var(--navy); min-width:18px;}
+  .choice .ctext{flex:1; font-size:0.93rem;}
+  .choice.struck .ctext{text-decoration:line-through; opacity:0.45;}
+  .strike-btn{
+    border:1px solid var(--border); background:#fff; color:var(--muted); border-radius:5px;
+    width:24px; height:24px; font-size:0.75rem; cursor:pointer; flex-shrink:0; line-height:1;
+  }
+  .strike-btn:hover{background:#f1f1f1;}
+  .choice.selected{border-color:var(--navy); background:#eef4fb;}
+  .choice.correct-reveal{border-color:var(--correct); background:var(--correct-bg);}
+  .choice.wrong-reveal{border-color:var(--wrong); background:var(--wrong-bg);}
+  .qactions{display:flex; gap:10px; margin-top:10px; align-items:center;}
+  .btn-check{
+    background:var(--accent); color:#fff; border:none; padding:8px 16px; border-radius:6px;
+    font-size:0.85rem; cursor:pointer;
+  }
+  .btn-check:disabled{background:#aab8c2; cursor:not-allowed;}
+  .result-flag{font-weight:700; font-size:0.85rem;}
+  .result-flag.correct{color:var(--correct);}
+  .result-flag.incorrect{color:var(--wrong);}
+  .feedback{
+    display:none; margin-top:14px; border-top:1px dashed var(--border); padding-top:12px;
+  }
+  .feedback.show{display:block;}
+  .feedback h4{margin:0 0 4px; font-size:0.85rem; color:var(--navy);}
+  .rationale{font-size:0.9rem; margin-bottom:10px;}
+  .wrong-explain{font-size:0.87rem; margin:3px 0; color:var(--text);}
+  .wrong-explain b{color:var(--wrong);}
+  .metarow{
+    display:flex; flex-wrap:wrap; gap:14px; font-size:0.78rem; color:var(--muted); margin-top:10px;
+    border-top:1px solid var(--border); padding-top:8px;
+  }
+  .metarow span b{color:var(--navy);}
+  footer{text-align:center; padding:26px; font-size:0.8rem; color:var(--muted);}
+  #summaryBox{
+    display:none; background:var(--navy); color:#fff; border-radius:10px; padding:20px;
+    margin-bottom:20px;
+  }
+  #summaryBox.show{display:block;}
+  #summaryBox h2{margin-top:0;}
+  #summaryBox table{width:100%; border-collapse:collapse; margin-top:12px; font-size:0.85rem;}
+  #summaryBox td, #summaryBox th{padding:5px 8px; border-bottom:1px solid rgba(255,255,255,0.2); text-align:left;}
+  .scorebar{background:rgba(255,255,255,0.15); border-radius:6px; height:10px; overflow:hidden; margin-top:6px;}
+  .scorebar-fill{background:#4fd1a5; height:100%;}
+  #jumpnav{
+    display:flex; flex-wrap:wrap; gap:4px; margin:14px 24px 0; max-width:880px;
+  }
+  #jumpnav a{
+    width:26px; height:26px; display:flex; align-items:center; justify-content:center;
+    font-size:0.7rem; border-radius:5px; border:1px solid var(--border); color:var(--navy);
+    text-decoration:none; background:#fff;
+  }
+  #jumpnav a.answered{background:#dfeee3; border-color:var(--correct);}
+  #jumpnav a.wronged{background:#fbe4e1; border-color:var(--wrong);}
+</style>
+</head>
+<body>
+
+<header class="exam-header">
+  <h1>PAS-523 Clinical Medicine II — Hepatic &amp; Biliary Disorders Practice Quiz</h1>
+  <p>50 questions · Hepatic &amp; Biliary Disorders block only (Lecture 5, plus variceal overlap from Lecture 2)</p>
+  <p>Prepared for Mercedas · Exam IV GI Block</p>
+</header>
+
+<div class="disclaimer">
+  <b>How this quiz was built:</b> All medical facts, diagnostic criteria, and management steps are drawn directly from your Lecture 5 (Liver, Gallbladder, Pancreas) deck, plus the esophageal variceal overlap section of Lecture 2. This set covers only the Hepatic &amp; Biliary Disorders blueprint category (18% weight) — viral hepatitis, cirrhosis, hepatic encephalopathy, NAFLD/MASH, portal hypertension, variceal hemorrhage, hepatocellular carcinoma, and the gallstone/cholangitis spectrum. Pancreatic content from Lecture 5 was intentionally excluded, since it belongs to a separate blueprint category.
+</div>
+
+<div class="toolbar">
+  <div class="stats" id="statsLine">0 / 50 answered</div>
+  <div>
+    <button class="secondary" id="btnStrikeHelp" onclick="alert('Click the small ⌀ button next to any answer choice to cross it out while you work through the question — this does not submit that choice, it just hides it visually so you can narrow down your options.');">Cross-out tip</button>
+    <button id="btnSubmitExam">Submit Full Exam</button>
+  </div>
+</div>
+
+<div id="jumpnav"></div>
+
+<main>
+  <div id="summaryBox">
+    <h2>Exam Summary</h2>
+    <div id="summaryScore"></div>
+    <div class="scorebar"><div class="scorebar-fill" id="scorebarFill" style="width:0%"></div></div>
+    <table id="summaryTable"></table>
+  </div>
+
+  <div id="examContainer"></div>
+</main>
+
+<footer>
+  Practice exam generated from your uploaded materials. Not an official PAS-523 exam. Verify against your syllabus/professor guidance before relying on any single prediction.
+</footer>
+
+<script id="examData" type="application/json">
+[
+  {
+    "num": 1,
+    "category": "Hepatitis A",
+    "bloom": "Apply",
+    "task": "Management",
+    "source": "Lecture 5",
+    "stem": "A 24-year-old man returns from a 3-week trip to a country with limited sanitation infrastructure. Two weeks after returning, he develops fever, malaise, nausea, and dark urine, followed by scleral icterus. Serologic testing reveals IgM antibody positivity, and liver enzymes are markedly elevated with ALT in the 1000s. Which of the following is the most appropriate management?",
+    "choices": {
+      "A": "Entecavir",
+      "B": "Sofosbuvir-velpatasvir",
+      "C": "Supportive care",
+      "D": "Pegylated interferon alpha-2b",
+      "E": "N-acetylcysteine"
+    },
+    "correct": "C",
+    "rationale": "Acute hepatitis A is a self-limited illness confirmed by IgM anti-HAV positivity. Treatment is supportive care, as it typically resolves within a few months without antiviral therapy.",
+    "wrong": {
+      "A": "Entecavir treats hepatitis B, not indicated here.",
+      "B": "Sofosbuvir-velpatasvir is a hepatitis C regimen.",
+      "D": "Pegylated interferon is used for hepatitis D.",
+      "E": "NAC is used for acetaminophen toxicity, not viral hepatitis A."
+    }
+  },
+  {
+    "num": 2,
+    "category": "Hepatitis B",
+    "bloom": "Analyze",
+    "task": "Diagnostic testing (serology)",
+    "source": "Lecture 5",
+    "stem": "A 32-year-old man undergoes hepatitis B serologic testing as part of a routine health screening. Results show a positive hepatitis B surface antibody (anti-HBs) with negative hepatitis B surface antigen (HBsAg) and negative hepatitis B core antibody (anti-HBc). Which of the following best explains this serologic pattern?",
+    "choices": {
+      "A": "Acute hepatitis B infection",
+      "B": "Chronic replicative hepatitis B infection",
+      "C": "Window period of infection",
+      "D": "Resolved natural infection",
+      "E": "Immunization (vaccination) rather than natural infection"
+    },
+    "correct": "E",
+    "rationale": "Isolated positive anti-HBs without HBsAg or anti-HBc indicates immunity from vaccination rather than natural infection, since natural infection would also produce a positive anti-HBc.",
+    "wrong": {
+      "A": "Acute infection shows positive HBsAg and IgM anti-HBc, not this pattern.",
+      "B": "Chronic replicative hepatitis shows positive HBsAg, IgG anti-HBc, and positive HBeAg.",
+      "C": "The window period shows IgM anti-HBc positivity with both HBsAg and anti-HBs negative.",
+      "D": "Resolved natural infection shows positive anti-HBs AND positive anti-HBc (IgG); the absence of anti-HBc here points toward vaccination instead."
+    }
+  },
+  {
+    "num": 3,
+    "category": "Hepatitis C",
+    "bloom": "Apply",
+    "task": "Pharmacotherapy / pretreatment screening",
+    "source": "Lecture 5",
+    "stem": "A 45-year-old man with a history of IV drug use undergoes screening and is found to be anti-HCV antibody positive with detectable HCV RNA. Prior to initiating oral antiviral therapy, which of the following should be checked given the treatment's potential to cause reactivation?",
+    "choices": {
+      "A": "Hepatitis B serologies",
+      "B": "Hepatitis A IgM",
+      "C": "Alpha-fetoprotein",
+      "D": "Ceruloplasmin",
+      "E": "Iron studies"
+    },
+    "correct": "A",
+    "rationale": "Hepatitis C oral antiviral regimens have the potential to reactivate hepatitis B; hepatitis B serologies should always be checked before starting treatment.",
+    "wrong": {
+      "B": "Hepatitis A IgM would confirm acute hepatitis A, unrelated to this reactivation risk.",
+      "C": "AFP is a tumor marker used in HCC surveillance, not relevant to treatment-initiation reactivation risk.",
+      "D": "Ceruloplasmin evaluates for Wilson disease, not discussed in this course as relevant here.",
+      "E": "Iron studies evaluate for hemochromatosis, not relevant to this reactivation concern."
+    }
+  },
+  {
+    "num": 4,
+    "category": "Hepatitis D",
+    "bloom": "Analyze",
+    "task": "Diagnosis / pathophysiology",
+    "source": "Lecture 5",
+    "stem": "A 38-year-old man with a known history of chronic hepatitis B infection presents with worsening jaundice and fatigue. Testing reveals positive hepatitis D antigen and serum HDV RNA. Which of the following best describes this clinical scenario?",
+    "choices": {
+      "A": "Co-infection, since he has no prior hepatitis B exposure",
+      "B": "This pattern is not possible, as hepatitis D cannot infect a person with chronic hepatitis B",
+      "C": "Isolated hepatitis D infection without hepatitis B involvement",
+      "D": "Superinfection, with a higher risk of progression to liver failure or cirrhosis",
+      "E": "This represents a resolved hepatitis D infection"
+    },
+    "correct": "D",
+    "rationale": "Superinfection occurs when a known hepatitis B carrier acquires hepatitis D, which carries a higher incidence of liver failure/cirrhosis and hepatocellular carcinoma risk compared to co-infection.",
+    "wrong": {
+      "A": "Co-infection describes simultaneous, first-time infection with both hepatitis B and D in a patient with no prior exposure, not this scenario of a known chronic HBV carrier.",
+      "B": "Hepatitis D can and does infect chronic hepatitis B carriers as a superinfection.",
+      "C": "Hepatitis D always requires HBsAg to become infectious and cannot occur in isolation from hepatitis B.",
+      "E": "Active positive HDV RNA and antigen indicate active, not resolved, infection."
+    }
+  },
+  {
+    "num": 5,
+    "category": "Hepatitis E",
+    "bloom": "Understand",
+    "task": "Pathophysiology / epidemiology",
+    "source": "Lecture 5",
+    "stem": "A 34-year-old pregnant woman living in a region with limited access to clean water develops jaundice, malaise, nausea, and abdominal pain approximately 5-6 weeks after a presumed exposure. Serologic testing reveals IgM anti-HEV positivity. Which of the following is true regarding this infection?",
+    "choices": {
+      "A": "It is the most common cause of acute viral hepatitis globally and is transmitted through contaminated food and water",
+      "B": "It requires co-infection with hepatitis B to cause disease",
+      "C": "Chronic infection is expected in most immunocompetent patients",
+      "D": "It is transmitted primarily via percutaneous exposure",
+      "E": "A vaccine is routinely given as part of childhood immunization in this course's teaching"
+    },
+    "correct": "A",
+    "rationale": "Hepatitis E is an RNA virus transmitted through contaminated food and water and is the most common cause of acute viral hepatitis globally; most cases are self-limited, with fulminant hepatitis occurring in only about 1-2%.",
+    "wrong": {
+      "B": "The co-infection requirement describes hepatitis D, not hepatitis E.",
+      "C": "Chronic hepatitis E can develop in immunocompromised patients, not typically in immunocompetent hosts.",
+      "D": "Hepatitis E is transmitted through contaminated food and water, not percutaneous exposure.",
+      "E": "Hepatitis E vaccination was not described as part of routine childhood immunization in this course's teaching (unlike hepatitis A and B)."
+    }
+  },
+  {
+    "num": 6,
+    "category": "Cirrhosis",
+    "bloom": "Apply",
+    "task": "Pathophysiology",
+    "source": "Lecture 5",
+    "stem": "A 58-year-old man with cirrhosis undergoes physical examination. Which of the following findings is most directly explained by the liver's reduced ability to clear circulating estrogen?",
+    "choices": {
+      "A": "Spider angiomata",
+      "B": "Palmar erythema",
+      "C": "Muscle wasting",
+      "D": "Gynecomastia",
+      "E": "Caput medusae"
+    },
+    "correct": "D",
+    "rationale": "The liver normally clears circulating estrogen; in cirrhosis this clearance is impaired, leading to hyperestrogenism and gynecomastia.",
+    "wrong": {
+      "A": "Spider angiomata relate to vascular changes but are not the specific finding this course ties directly to impaired estrogen clearance.",
+      "B": "Palmar erythema is a related vascular finding but is not the specific hormone-imbalance finding emphasized in this course.",
+      "C": "Muscle wasting reflects a malnutrition/catabolic state, not hormone imbalance.",
+      "E": "Caput medusae results from portosystemic venous shunting (portal hypertension), not hormone imbalance."
+    }
+  },
+  {
+    "num": 7,
+    "category": "Hepatic Encephalopathy",
+    "bloom": "Understand",
+    "task": "Pattern recognition",
+    "source": "Lecture 5",
+    "stem": "A 65-year-old man with cirrhosis is brought in for evaluation of confusion. On examination, he has a flapping tremor elicited with wrist extension and a distinctly foul, musty breath odor. Which of the following terms describes the breath finding?",
+    "choices": {
+      "A": "Halitosis",
+      "B": "Ketotic breath",
+      "C": "Fetor hepaticus",
+      "D": "Uremic fetor",
+      "E": "Sulfur breath"
+    },
+    "correct": "C",
+    "rationale": "Fetor hepaticus is the musty breath odor associated with hepatic encephalopathy, occurring alongside asterixis (flapping tremor with wrist extension).",
+    "wrong": {
+      "A": "Halitosis is a generic term for bad breath, not the specific hepatic finding.",
+      "B": "Ketotic breath describes a fruity odor from ketosis, unrelated to liver failure.",
+      "D": "Uremic fetor describes breath odor associated with renal failure, not hepatic encephalopathy.",
+      "E": "\"Sulfur breath\" is not the term used in this course's teaching for this finding."
+    }
+  },
+  {
+    "num": 8,
+    "category": "NAFLD / MASH",
+    "bloom": "Analyze",
+    "task": "Pathophysiology / diagnosis",
+    "source": "Lecture 5",
+    "stem": "A 50-year-old woman with obesity and type 2 diabetes is found to have hepatic steatosis on ultrasound performed for elevated liver enzymes. Liver biopsy shows hepatocyte injury, inflammation, and early fibrosis in addition to fat accumulation. Which of the following terms best describes this histologic picture, as opposed to simple fat accumulation alone?",
+    "choices": {
+      "A": "Nonalcoholic steatohepatitis (NASH/MASH)",
+      "B": "Nonalcoholic fatty liver (simple steatosis)",
+      "C": "Acute viral hepatitis",
+      "D": "Cirrhosis",
+      "E": "Hepatocellular carcinoma"
+    },
+    "correct": "A",
+    "rationale": "NASH (also termed MASH) is distinguished from simple nonalcoholic fatty liver by the presence of hepatocyte injury and inflammation, which can progress to fibrosis and cirrhosis.",
+    "wrong": {
+      "B": "Simple nonalcoholic fatty liver involves triglyceride accumulation within hepatocytes without the inflammation/injury described here.",
+      "C": "Viral hepatitis is a distinct etiology, not consistent with this biopsy description in an obese diabetic patient with steatosis.",
+      "D": "Cirrhosis represents a later, more advanced stage of fibrosis with architectural distortion, beyond what is described here.",
+      "E": "HCC is a malignancy, not represented by this inflammatory/fibrotic biopsy pattern."
+    }
+  },
+  {
+    "num": 9,
+    "category": "Portal Hypertension",
+    "bloom": "Remember",
+    "task": "Diagnostic interpretation",
+    "source": "Lecture 5",
+    "stem": "A 62-year-old man with cirrhosis undergoes hepatic venous pressure gradient (HVPG) measurement. Above which of the following values does portal hypertension typically become clinically significant?",
+    "choices": {
+      "A": "1 mmHg",
+      "B": "5 mmHg",
+      "C": "10 mmHg",
+      "D": "20 mmHg",
+      "E": "50 mmHg"
+    },
+    "correct": "C",
+    "rationale": "Normal HVPG is 1-5 mmHg; portal hypertension typically becomes clinically significant above 10 mmHg.",
+    "wrong": {
+      "A": "1 mmHg is within (below) the normal HVPG range.",
+      "B": "5 mmHg is at the upper limit of normal, not the clinically significant threshold.",
+      "D": "20 mmHg is well above the clinically significant threshold, which is not the defining cutoff taught.",
+      "E": "50 mmHg is far higher than any value discussed in this course."
+    }
+  },
+  {
+    "num": 10,
+    "category": "Variceal Hemorrhage",
+    "bloom": "Apply",
+    "task": "Pharmacotherapy / emergency sequencing",
+    "source": "Lecture 5 (+2)",
+    "stem": "A 55-year-old man with known cirrhosis and esophageal varices presents with hematemesis. His heart rate is 122 beats/min and blood pressure is 88/54 mm Hg. After establishing IV access and beginning fluid resuscitation, which of the following medication combinations should be started next, prior to endoscopy?",
+    "choices": {
+      "A": "Furosemide and spironolactone",
+      "B": "Lactulose and rifaximin",
+      "C": "Octreotide and ceftriaxone",
+      "D": "Entecavir and tenofovir",
+      "E": "Cholestyramine and vitamin K"
+    },
+    "correct": "C",
+    "rationale": "In acute variceal hemorrhage, octreotide (to reduce splanchnic blood flow) and prophylactic antibiotics (such as ceftriaxone) are started after initial resuscitation and prior to endoscopic therapy.",
+    "wrong": {
+      "A": "Furosemide/spironolactone are ascites medications, not appropriate for acute hemorrhage.",
+      "B": "Lactulose/rifaximin treat hepatic encephalopathy, not the acute bleeding emergency.",
+      "D": "Entecavir/tenofovir treat hepatitis B, not acute variceal hemorrhage.",
+      "E": "Cholestyramine treats pruritus; this combination is not the priority acute intervention here."
+    }
+  },
+  {
+    "num": 11,
+    "category": "Hepatocellular Carcinoma",
+    "bloom": "Apply",
+    "task": "Diagnostic selection",
+    "source": "Lecture 5",
+    "stem": "A 60-year-old man with cirrhosis due to chronic hepatitis B undergoes routine surveillance ultrasound, which reveals a 1.5 cm liver lesion. Which of the following is the most appropriate next step?",
+    "choices": {
+      "A": "Continue surveillance ultrasound every 6 months without further imaging",
+      "B": "Liver biopsy of the lesion is required in all cases before proceeding",
+      "C": "Repeat ultrasound in 3-6 months only",
+      "D": "CT abdomen/pelvis with contrast or MRI with/without contrast",
+      "E": "Immediate initiation of systemic chemotherapy"
+    },
+    "correct": "D",
+    "rationale": "Ultrasound lesions 1 cm or larger warrant further evaluation with contrast-enhanced CT or MRI, which can show the characteristic arterial enhancement with venous washout of HCC.",
+    "wrong": {
+      "A": "Lesions \u22651 cm require further characterization with cross-sectional imaging, not simple continued surveillance.",
+      "B": "Biopsy is typically not required when imaging criteria are diagnostic in a high-risk patient.",
+      "C": "The 3-6 month repeat ultrasound interval applies to lesions smaller than 1 cm, not this 1.5 cm lesion.",
+      "E": "Chemotherapy would not be initiated without further diagnostic/staging workup."
+    }
+  },
+  {
+    "num": 12,
+    "category": "Cholelithiasis",
+    "bloom": "Apply",
+    "task": "Diagnostic selection",
+    "source": "Lecture 5",
+    "stem": "A 38-year-old woman presents with episodic RUQ pain that occurs after eating fatty meals, radiating to her right shoulder blade, lasting about an hour before resolving spontaneously. She has no fever, and her physical examination is unremarkable between episodes. Which of the following is the most appropriate initial diagnostic test?",
+    "choices": {
+      "A": "HIDA scan",
+      "B": "CT abdomen without contrast",
+      "C": "ERCP",
+      "D": "MRCP",
+      "E": "Abdominal ultrasound"
+    },
+    "correct": "E",
+    "rationale": "Abdominal ultrasound is the first-line diagnostic test for suspected cholelithiasis/biliary colic, identifying gallstones as echogenic foci.",
+    "wrong": {
+      "A": "HIDA is reserved for cases where the diagnosis remains unclear after ultrasound.",
+      "B": "CT is not the first-line test for suspected gallstone disease.",
+      "C": "ERCP is invasive and reserved for confirmed choledocholithiasis/cholangitis, not initial biliary colic evaluation.",
+      "D": "MRCP would be considered if CBD pathology were suspected, not as the initial test for typical biliary colic."
+    }
+  },
+  {
+    "num": 13,
+    "category": "Cholecystitis",
+    "bloom": "Understand",
+    "task": "Pattern recognition",
+    "source": "Lecture 5",
+    "stem": "A 42-year-old woman presents with RUQ pain, fever, and nausea for the past 8 hours. On examination, she has a positive Murphy sign and referred pain to the right subscapular region. Which of the following terms describes this referred pain finding?",
+    "choices": {
+      "A": "Charcot sign",
+      "B": "Boas sign",
+      "C": "Cullen sign",
+      "D": "Grey Turner sign",
+      "E": "Rovsing sign"
+    },
+    "correct": "B",
+    "rationale": "Boas sign refers to referred pain to the right shoulder or subscapular area seen in acute cholecystitis.",
+    "wrong": {
+      "A": "\"Charcot\" refers to Charcot triad in cholangitis, not a referred pain sign in cholecystitis.",
+      "C": "Cullen sign refers to periumbilical ecchymosis in hemorrhagic pancreatitis.",
+      "D": "Grey Turner sign refers to flank ecchymosis in hemorrhagic pancreatitis.",
+      "E": "Rovsing sign is associated with appendicitis, not cholecystitis."
+    }
+  },
+  {
+    "num": 14,
+    "category": "Choledocholithiasis",
+    "bloom": "Apply",
+    "task": "Diagnostic selection",
+    "source": "Lecture 5",
+    "stem": "A 48-year-old woman presents with RUQ and epigastric pain that has persisted for over 6 hours, along with nausea and mild jaundice. Labs show elevated ALT/AST with a cholestatic pattern (elevated ALP and GGT). Abdominal ultrasound shows a dilated common bile duct. Which of the following is the diagnostic test of choice for this condition?",
+    "choices": {
+      "A": "HIDA scan",
+      "B": "ERCP",
+      "C": "Abdominal CT without contrast",
+      "D": "Upper endoscopy without cholangiography",
+      "E": "Plain abdominal radiograph"
+    },
+    "correct": "B",
+    "rationale": "ERCP is the diagnostic test of choice for choledocholithiasis, as it is both diagnostic and therapeutic (allowing stone extraction), though MRCP is a less invasive alternative for imaging.",
+    "wrong": {
+      "A": "HIDA evaluates gallbladder filling/cystic duct patency, not choledocholithiasis directly.",
+      "C": "CT without contrast is not the diagnostic test of choice for suspected CBD stones.",
+      "D": "Endoscopy without cholangiography does not evaluate the bile duct directly.",
+      "E": "Plain radiograph does not reliably identify CBD stones."
+    }
+  },
+  {
+    "num": 15,
+    "category": "Ascending Cholangitis",
+    "bloom": "Apply",
+    "task": "Pattern recognition",
+    "source": "Lecture 5",
+    "stem": "A 62-year-old woman presents with fever, chills, RUQ pain, and jaundice. She is alert and oriented, and her blood pressure is 122/76 mm Hg. Which of the following best describes her presentation?",
+    "choices": {
+      "A": "Reynolds pentad",
+      "B": "Biliary colic",
+      "C": "Boas sign",
+      "D": "ABCDE of portal hypertension",
+      "E": "Charcot triad"
+    },
+    "correct": "E",
+    "rationale": "Fever with chills, RUQ pain, and jaundice constitute Charcot triad, classically associated with ascending cholangitis.",
+    "wrong": {
+      "A": "Reynolds pentad requires the additional findings of hypotension (shock) and altered mental status, which are absent here.",
+      "B": "Biliary colic describes episodic pain without fever/jaundice as a triad.",
+      "C": "Boas sign is a referred pain finding in cholecystitis, not this triad.",
+      "D": "The ABCDE mnemonic describes findings of portal hypertension, not this presentation."
+    }
+  },
+  {
+    "num": 16,
+    "category": "Hepatitis A",
+    "bloom": "Understand",
+    "task": "Pathophysiology / transmission",
+    "source": "Lecture 5",
+    "stem": "Which of the following is the most likely route of transmission for the hepatitis A virus?",
+    "choices": {
+      "A": "Percutaneous blood exposure",
+      "B": "Fecal-oral route via person-to-person contact or contaminated food",
+      "C": "Perinatal transmission during childbirth",
+      "D": "Sexual transmission as the primary route in all populations",
+      "E": "Requires co-infection with another hepatitis virus to be transmissible"
+    },
+    "correct": "B",
+    "rationale": "Hepatitis A is an RNA virus transmitted primarily via the fecal-oral route, through person-to-person contact or cross-contamination, and is most common in developing countries.",
+    "wrong": {
+      "A": "Percutaneous transmission is characteristic of hepatitis B/C, not A.",
+      "C": "Perinatal transmission is a hallmark of hepatitis B, not A.",
+      "D": "Sexual transmission can occur (e.g., MSM) but is not the primary route overall; fecal-oral is primary.",
+      "E": "This describes hepatitis D's dependency on hepatitis B, not hepatitis A."
+    }
+  },
+  {
+    "num": 17,
+    "category": "Hepatitis B",
+    "bloom": "Apply",
+    "task": "Pharmacotherapy",
+    "source": "Lecture 5",
+    "stem": "A 40-year-old man with chronic hepatitis B infection has persistently elevated ALT and a positive HBeAg. Which of the following is the most appropriate first-line pharmacologic treatment?",
+    "choices": {
+      "A": "Lamivudine",
+      "B": "Adefovir",
+      "C": "Telbivudine",
+      "D": "Tenofovir",
+      "E": "Sofosbuvir"
+    },
+    "correct": "D",
+    "rationale": "Entecavir and tenofovir are first-line antiviral agents for chronic hepatitis B with persistent/severe symptoms, elevated bilirubin, severe transaminitis, or HBeAg persistence.",
+    "wrong": {
+      "A": "Lamivudine is an alternate agent, not first-line, due to higher resistance rates.",
+      "B": "Adefovir is an alternate, not first-line agent.",
+      "C": "Telbivudine is an alternate agent, not first-line.",
+      "E": "Sofosbuvir is used for hepatitis C, not hepatitis B."
+    }
+  },
+  {
+    "num": 18,
+    "category": "Hepatitis C",
+    "bloom": "Apply",
+    "task": "Pharmacotherapy",
+    "source": "Lecture 5",
+    "stem": "A 50-year-old man with chronic hepatitis C is started on an oral antiviral regimen. Which of the following is an appropriate first-line regimen and duration per course teaching?",
+    "choices": {
+      "A": "Entecavir for 12 months",
+      "B": "Pegylated interferon alpha-2b for 6 months",
+      "C": "N-acetylcysteine for 3 weeks",
+      "D": "Sofosbuvir-velpatasvir for 12 weeks",
+      "E": "Lactulose for 8 weeks"
+    },
+    "correct": "D",
+    "rationale": "First-line oral regimens for hepatitis C include glecaprevir-pibrentasvir for 8 weeks or sofosbuvir-velpatasvir for 12 weeks, both with high cure potential.",
+    "wrong": {
+      "A": "Entecavir treats hepatitis B, not hepatitis C.",
+      "B": "Pegylated interferon is used for hepatitis D, not first-line hepatitis C therapy in this course's teaching.",
+      "C": "NAC treats acetaminophen toxicity, unrelated to hepatitis C.",
+      "E": "Lactulose treats hepatic encephalopathy, not hepatitis C infection itself."
+    }
+  },
+  {
+    "num": 19,
+    "category": "Hepatitis D",
+    "bloom": "Understand",
+    "task": "Pathophysiology",
+    "source": "Lecture 5",
+    "stem": "Which of the following is required for the hepatitis D virus to become infectious?",
+    "choices": {
+      "A": "Concurrent hepatitis A infection",
+      "B": "Concurrent hepatitis C infection",
+      "C": "Hepatitis B surface antigen (HBsAg)",
+      "D": "Autoimmune antibody production",
+      "E": "Alcohol-induced liver injury"
+    },
+    "correct": "C",
+    "rationale": "Hepatitis D is an RNA virus that requires the hepatitis B surface antigen (HBsAg) to assemble and become infectious, so infectious hepatitis D is always associated with hepatitis B infection.",
+    "wrong": {
+      "A": "Hepatitis A is unrelated to hepatitis D infectivity.",
+      "B": "Hepatitis C is unrelated to hepatitis D infectivity.",
+      "D": "Autoimmune antibodies are unrelated to hepatitis D's infectious mechanism.",
+      "E": "Alcohol-induced injury is not required for hepatitis D infectivity."
+    }
+  },
+  {
+    "num": 20,
+    "category": "Hepatitis E",
+    "bloom": "Understand",
+    "task": "Pathophysiology",
+    "source": "Lecture 5",
+    "stem": "In which of the following patient populations can hepatitis E progress to chronic infection, per course teaching?",
+    "choices": {
+      "A": "Healthy pediatric patients",
+      "B": "Pregnant patients in the third trimester",
+      "C": "Immunocompromised patients",
+      "D": "Patients with a recent history of hepatitis A infection",
+      "E": "Patients who have received the hepatitis A vaccine"
+    },
+    "correct": "C",
+    "rationale": "Chronic hepatitis E can develop in immunocompromised patients, distinguishing it from the typically self-limited course seen in immunocompetent individuals.",
+    "wrong": {
+      "A": "Chronic hepatitis E was not described as expected in healthy pediatric patients.",
+      "B": "Pregnancy increases the risk of severe/fulminant acute disease rather than chronicity specifically.",
+      "D": "Prior hepatitis A infection is unrelated to hepatitis E chronicity risk.",
+      "E": "Hepatitis A vaccination is unrelated to hepatitis E chronicity risk."
+    }
+  },
+  {
+    "num": 21,
+    "category": "Cirrhosis",
+    "bloom": "Understand",
+    "task": "Diagnostic testing",
+    "source": "Lecture 5",
+    "stem": "Which of the following is the definitive diagnostic test for cirrhosis?",
+    "choices": {
+      "A": "CMP showing elevated LFTs",
+      "B": "Liver biopsy",
+      "C": "Abdominal ultrasound showing increased echogenicity",
+      "D": "Elastography",
+      "E": "Coagulation studies"
+    },
+    "correct": "B",
+    "rationale": "Liver biopsy is the definitive diagnostic test for cirrhosis, directly assessing hepatic architecture distortion and regenerative nodules, though noninvasive tests are often used first.",
+    "wrong": {
+      "A": "Elevated LFTs support but do not definitively diagnose cirrhosis.",
+      "C": "Ultrasound findings (nodularity, increased echogenicity, atrophy/hypertrophy) are suggestive but not definitive.",
+      "D": "Elastography estimates liver stiffness and supports the diagnosis but is not definitive.",
+      "E": "Coagulation studies assess synthetic function but do not provide a definitive diagnosis."
+    }
+  },
+  {
+    "num": 22,
+    "category": "Hepatic Encephalopathy",
+    "bloom": "Analyze",
+    "task": "Diagnostic workup",
+    "source": "Lecture 5",
+    "stem": "A 60-year-old man with cirrhosis presents with new confusion. His ammonia level is elevated. Prior to initiating treatment, an evaluation to rule out an underlying trigger should be performed. Which of the following would most appropriately guide this evaluation?",
+    "choices": {
+      "A": "Urine drug screen only",
+      "B": "CT head only",
+      "C": "A broad workup including infection markers (blood cultures, procalcitonin), electrolytes, and renal function",
+      "D": "Ammonia level alone is sufficient, no further workup needed",
+      "E": "Liver biopsy"
+    },
+    "correct": "C",
+    "rationale": "Hepatic encephalopathy workup includes assessment for precipitating factors such as infection (blood cultures, lactic acid, procalcitonin), electrolyte disturbances, renal function, and other contributing causes, in addition to ammonia level and coagulation studies.",
+    "wrong": {
+      "A": "Urine drug screen is one component of the workup but is not sufficient alone.",
+      "B": "CT head is a reasonable component to exclude other CNS causes but is not sufficient alone.",
+      "D": "Management requires identifying and treating precipitating factors, not just confirming ammonia elevation.",
+      "E": "Liver biopsy is not part of the acute encephalopathy workup."
+    }
+  },
+  {
+    "num": 23,
+    "category": "NAFLD / MASH",
+    "bloom": "Apply",
+    "task": "Pharmacotherapy",
+    "source": "Lecture 5",
+    "stem": "A 47-year-old man with NASH and stage 2 fibrosis has not tolerated GLP-1 based therapy. Which of the following is an appropriate alternative medication that acts as a thyroid receptor beta agonist to reduce liver fat and inflammation?",
+    "choices": {
+      "A": "Semaglutide",
+      "B": "Resmetirom",
+      "C": "Entecavir",
+      "D": "Cholestyramine",
+      "E": "Lactulose"
+    },
+    "correct": "B",
+    "rationale": "Resmetirom is a thyroid receptor beta agonist used as an alternative for patients with stage 2-3 fibrosis who do not tolerate GLP-1 based therapies, helping reduce liver fat and inflammation.",
+    "wrong": {
+      "A": "Semaglutide is a GLP-1 based therapy, which this patient did not tolerate.",
+      "C": "Entecavir treats hepatitis B, unrelated to NASH.",
+      "D": "Cholestyramine treats pruritus, unrelated to NASH fibrosis treatment.",
+      "E": "Lactulose treats hepatic encephalopathy, unrelated to NASH."
+    }
+  },
+  {
+    "num": 24,
+    "category": "Portal Hypertension",
+    "bloom": "Understand",
+    "task": "Pattern recognition",
+    "source": "Lecture 5",
+    "stem": "A patient with cirrhosis and portal hypertension is noted to have prominent dilated veins radiating from the umbilicus across the abdominal wall. Which of the following terms describes this finding?",
+    "choices": {
+      "A": "Spider angiomata",
+      "B": "Boas sign",
+      "C": "Murphy sign",
+      "D": "Cullen sign",
+      "E": "Caput medusae"
+    },
+    "correct": "E",
+    "rationale": "Caput medusae describes dilated periumbilical veins that develop as collateral portosystemic shunting from portal hypertension, part of the classic ABCDE findings (Ascites, Bleeding, Caput medusae, Diminished liver, Enlarged spleen).",
+    "wrong": {
+      "A": "Spider angiomata are small vascular skin lesions, not periumbilical dilated veins.",
+      "B": "Boas sign refers to referred right subscapular pain associated with cholecystitis, unrelated to abdominal wall veins.",
+      "C": "Murphy sign is a physical exam finding for cholecystitis, unrelated to abdominal wall veins.",
+      "D": "Cullen sign refers to periumbilical ecchymosis seen in hemorrhagic pancreatitis, not dilated veins."
+    }
+  },
+  {
+    "num": 25,
+    "category": "Variceal Hemorrhage",
+    "bloom": "Understand",
+    "task": "Screening",
+    "source": "Lecture 2",
+    "stem": "Which of the following patients with cirrhosis should undergo screening EGD for esophageal varices, per course teaching?",
+    "choices": {
+      "A": "Only patients who are currently experiencing active hematemesis",
+      "B": "Only patients who have already had a prior variceal bleed",
+      "C": "Only patients over age 70",
+      "D": "Patients who are newly diagnosed with cirrhosis",
+      "E": "Screening EGD is not recommended in this course's teaching"
+    },
+    "correct": "D",
+    "rationale": "EGD screening for esophageal varices is recommended in newly diagnosed cirrhotic patients to identify varices before rupture occurs and to guide primary prophylaxis.",
+    "wrong": {
+      "A": "Screening is intended to detect varices before active bleeding occurs, not only during active hemorrhage.",
+      "B": "Screening applies more broadly than only patients with a prior bleed; newly diagnosed cirrhotics should be screened.",
+      "C": "Screening is not limited to a specific advanced age cutoff.",
+      "E": "Screening EGD is explicitly recommended in this course's teaching."
+    }
+  },
+  {
+    "num": 26,
+    "category": "Hepatocellular Carcinoma",
+    "bloom": "Understand",
+    "task": "Pathophysiology / risk factors",
+    "source": "Lecture 5",
+    "stem": "Which of the following is the most common risk factor for the development of hepatocellular carcinoma?",
+    "choices": {
+      "A": "Cirrhosis",
+      "B": "Isolated obesity without liver disease",
+      "C": "Hepatitis A infection",
+      "D": "NSAID use",
+      "E": "Cholelithiasis"
+    },
+    "correct": "A",
+    "rationale": "Cirrhosis (particularly macronodular) is the most common risk factor for hepatocellular carcinoma, along with chronic viral hepatitis (HBV, HCV, HDV) and alcoholic liver disease.",
+    "wrong": {
+      "B": "Obesity alone without underlying liver disease was not identified as the most common HCC risk factor.",
+      "C": "Hepatitis A does not lead to chronic liver disease or HCC.",
+      "D": "NSAID use is not an identified HCC risk factor in this course.",
+      "E": "Cholelithiasis is a biliary condition, not an established HCC risk factor."
+    }
+  },
+  {
+    "num": 27,
+    "category": "Cholelithiasis",
+    "bloom": "Remember",
+    "task": "Pathophysiology",
+    "source": "Lecture 5",
+    "stem": "Which of the following is the most common type of gallstone?",
+    "choices": {
+      "A": "Black pigment stones",
+      "B": "Brown pigment stones",
+      "C": "Calcium bilirubinate stones",
+      "D": "Struvite stones",
+      "E": "Cholesterol stones"
+    },
+    "correct": "E",
+    "rationale": "Cholesterol stones are the most common type of gallstone, accounting for approximately 90% of cases.",
+    "wrong": {
+      "A": "Black stones are associated with hemolysis or alcohol-related liver disease, not the most common type overall.",
+      "B": "Brown stones are associated with parasitic or bacterial infection, not the most common type overall.",
+      "C": "Calcium bilirubinate stones were not identified as the predominant type in this course.",
+      "D": "Struvite stones are associated with urinary tract calculi, not gallstones."
+    }
+  },
+  {
+    "num": 28,
+    "category": "Cholecystitis",
+    "bloom": "Apply",
+    "task": "Management",
+    "source": "Lecture 5",
+    "stem": "A 50-year-old man with acute cholecystitis is admitted for management. He is hemodynamically stable, and imaging shows no evidence of perforation or gangrene. In addition to IV fluids, pain control, and antiemetics, which of the following is the most appropriate additional treatment?",
+    "choices": {
+      "A": "NPO status alone without further intervention",
+      "B": "Immediate liver transplant evaluation",
+      "C": "Lactulose",
+      "D": "Nonselective beta-blocker therapy",
+      "E": "IV antibiotics with cholecystectomy preferably within 72 hours"
+    },
+    "correct": "E",
+    "rationale": "Acute cholecystitis management includes antibiotics targeting gram-negative enteric organisms (such as metronidazole plus a cephalosporin) and cholecystectomy, ideally performed laparoscopically within 72 hours.",
+    "wrong": {
+      "A": "NPO alone is insufficient; antibiotics and definitive surgical management are needed.",
+      "B": "Liver transplant evaluation is not indicated for cholecystitis.",
+      "C": "Lactulose treats hepatic encephalopathy, unrelated to cholecystitis.",
+      "D": "Beta-blockers are not part of cholecystitis management."
+    }
+  },
+  {
+    "num": 29,
+    "category": "Choledocholithiasis",
+    "bloom": "Analyze",
+    "task": "Diagnostic interpretation",
+    "source": "Lecture 5",
+    "stem": "Which of the following laboratory patterns is most consistent with choledocholithiasis?",
+    "choices": {
+      "A": "Isolated elevation of lipase without other abnormalities",
+      "B": "Elevated ALT/AST with a cholestatic pattern of elevated alkaline phosphatase and GGT",
+      "C": "Isolated elevation of ammonia without transaminitis",
+      "D": "Normal liver function tests with elevated CEA",
+      "E": "Isolated elevation of AFP"
+    },
+    "correct": "B",
+    "rationale": "Choledocholithiasis classically produces elevated transaminases along with a cholestatic pattern of elevated alkaline phosphatase and GGT, reflecting biliary obstruction.",
+    "wrong": {
+      "A": "Isolated lipase elevation without other findings does not reflect the described biliary obstruction pattern.",
+      "C": "Isolated ammonia elevation is a hepatic encephalopathy finding, not choledocholithiasis.",
+      "D": "Normal LFTs would not be expected with CBD obstruction, and CEA is a colorectal tumor marker.",
+      "E": "AFP is an HCC marker, unrelated to choledocholithiasis."
+    }
+  },
+  {
+    "num": 30,
+    "category": "Ascending Cholangitis",
+    "bloom": "Apply",
+    "task": "Pattern recognition",
+    "source": "Lecture 5",
+    "stem": "A 68-year-old man presents with fever, chills, RUQ pain, jaundice, hypotension, and altered mental status. Which of the following best describes this presentation?",
+    "choices": {
+      "A": "Charcot triad only",
+      "B": "Reynolds pentad",
+      "C": "Simple biliary colic",
+      "D": "ABCDE of portal hypertension",
+      "E": "Boas sign"
+    },
+    "correct": "B",
+    "rationale": "Reynolds pentad adds hypotension (shock) and altered mental status to Charcot triad, indicating severe, potentially life-threatening ascending cholangitis.",
+    "wrong": {
+      "A": "Charcot triad includes only fever/chills, RUQ pain, and jaundice, without the additional hypotension and AMS present here.",
+      "C": "Biliary colic does not include fever, hypotension, or AMS.",
+      "D": "The ABCDE mnemonic describes portal hypertension findings, not this presentation.",
+      "E": "Boas sign is a referred pain finding in cholecystitis, not this constellation."
+    }
+  },
+  {
+    "num": 31,
+    "category": "Hepatitis B",
+    "bloom": "Analyze",
+    "task": "Diagnostic testing (serology)",
+    "source": "Lecture 5",
+    "stem": "A 29-year-old woman is diagnosed with acute hepatitis B infection. Six months later, repeat serologic testing shows negative HBsAg, positive anti-HBs, and positive IgG anti-HBc. Which of the following does this pattern indicate?",
+    "choices": {
+      "A": "Chronic replicative hepatitis B",
+      "B": "Chronic non-replicative hepatitis B",
+      "C": "Window period",
+      "D": "Vaccination without natural infection",
+      "E": "Resolved hepatitis B infection"
+    },
+    "correct": "E",
+    "rationale": "Clearance of HBsAg with development of anti-HBs and IgG anti-HBc indicates resolution of natural hepatitis B infection with immunity.",
+    "wrong": {
+      "A": "Chronic replicative disease would show persistent positive HBsAg and HBeAg, not clearance of HBsAg.",
+      "B": "Chronic non-replicative disease also requires persistent HBsAg positivity.",
+      "C": "The window period occurs before anti-HBs appears, with only IgM anti-HBc positive.",
+      "D": "Vaccination alone would not produce a positive anti-HBc, since anti-HBc only develops with natural infection."
+    }
+  },
+  {
+    "num": 32,
+    "category": "Hepatitis C",
+    "bloom": "Understand",
+    "task": "Pathophysiology / complication",
+    "source": "Lecture 5",
+    "stem": "A 55-year-old woman with chronic hepatitis C remains untreated for several years. Which of the following complications is she at greatest long-term risk for as a direct consequence of this infection?",
+    "choices": {
+      "A": "Acute pancreatitis",
+      "B": "Cirrhosis and hepatocellular carcinoma",
+      "C": "Peptic ulcer perforation",
+      "D": "Achalasia",
+      "E": "Toxic megacolon"
+    },
+    "correct": "B",
+    "rationale": "Hepatitis C is the most common cause of chronic liver disease and cirrhosis leading to liver transplant, and chronic infection substantially increases the risk of hepatocellular carcinoma.",
+    "wrong": {
+      "A": "Acute pancreatitis is not a direct consequence of chronic hepatitis C.",
+      "C": "Peptic ulcer perforation is unrelated to viral hepatitis.",
+      "D": "Achalasia is an esophageal motility disorder unrelated to hepatitis C.",
+      "E": "Toxic megacolon is a colonic complication of colitis, unrelated to hepatitis C."
+    }
+  },
+  {
+    "num": 33,
+    "category": "Cirrhosis",
+    "bloom": "Apply",
+    "task": "Prognosis / classification",
+    "source": "Lecture 5",
+    "stem": "A patient with Child-Pugh Class A cirrhosis asks about her prognosis. Based on the survival data presented in this course, which of the following most closely reflects her expected 1-year survival?",
+    "choices": {
+      "A": "Approximately 100%",
+      "B": "Approximately 81%",
+      "C": "Approximately 45%",
+      "D": "Approximately 57%",
+      "E": "Approximately 35%"
+    },
+    "correct": "A",
+    "rationale": "Per course teaching, Child-Pugh Class A cirrhosis carries approximately 100% 1-year survival and 85% 2-year survival, reflecting better-preserved liver function compared to Class B and C.",
+    "wrong": {
+      "B": "81% 1-year survival corresponds to Child-Pugh Class B, not Class A.",
+      "C": "45% 1-year survival corresponds to Child-Pugh Class C, not Class A.",
+      "D": "57% corresponds to Class B 2-year survival, not Class A 1-year survival.",
+      "E": "35% corresponds to Class C 2-year survival, not Class A."
+    }
+  },
+  {
+    "num": 34,
+    "category": "Hepatic Encephalopathy",
+    "bloom": "Apply",
+    "task": "Pharmacotherapy",
+    "source": "Lecture 5",
+    "stem": "A 55-year-old man with cirrhosis and hepatic encephalopathy is started on lactulose but continues to have poor tolerance due to significant diarrhea and abdominal cramping. Which of the following is the most appropriate next step?",
+    "choices": {
+      "A": "Discontinue all therapy for hepatic encephalopathy",
+      "B": "Switch to cholestyramine",
+      "C": "Switch to spironolactone",
+      "D": "Increase the lactulose dose further despite intolerance",
+      "E": "Add or switch to rifaximin"
+    },
+    "correct": "E",
+    "rationale": "Rifaximin is the alternative agent for patients who do not tolerate lactulose in the management of hepatic encephalopathy.",
+    "wrong": {
+      "A": "Discontinuing therapy is inappropriate, as untreated hepatic encephalopathy can progress.",
+      "B": "Cholestyramine treats pruritus, not hepatic encephalopathy.",
+      "C": "Spironolactone treats ascites, not hepatic encephalopathy.",
+      "D": "Increasing a poorly tolerated dose does not address the intolerance and risks worsening symptoms."
+    }
+  },
+  {
+    "num": 35,
+    "category": "NAFLD / MASH",
+    "bloom": "Understand",
+    "task": "Pathophysiology / epidemiology",
+    "source": "Lecture 5",
+    "stem": "Which of the following is the most common underlying etiology of nonalcoholic fatty liver disease?",
+    "choices": {
+      "A": "Obesity",
+      "B": "Chronic viral hepatitis",
+      "C": "Autoimmune destruction of hepatocytes",
+      "D": "Alpha-1 antitrypsin deficiency",
+      "E": "Excessive iron deposition"
+    },
+    "correct": "A",
+    "rationale": "Obesity is the most common etiology of NAFLD, along with diabetes, hyperlipidemia, and steroid use.",
+    "wrong": {
+      "B": "Viral hepatitis is a separate etiology of liver disease, not the cause of NAFLD.",
+      "C": "Autoimmune hepatocyte destruction describes autoimmune hepatitis, not NAFLD.",
+      "D": "Alpha-1 antitrypsin deficiency was not identified as an etiology of NAFLD in this course.",
+      "E": "Iron deposition disorders were not identified as the driver of NAFLD in this course."
+    }
+  },
+  {
+    "num": 36,
+    "category": "Portal Hypertension",
+    "bloom": "Apply",
+    "task": "Pharmacotherapy",
+    "source": "Lecture 5 (+2)",
+    "stem": "Which of the following medication classes is used for primary prophylaxis against variceal hemorrhage in a patient with portal hypertension and known esophageal varices?",
+    "choices": {
+      "A": "Proton pump inhibitors",
+      "B": "Loop diuretics",
+      "C": "Aldosterone antagonists",
+      "D": "Bile acid sequestrants",
+      "E": "Nonselective beta-blockers"
+    },
+    "correct": "E",
+    "rationale": "Nonselective beta-blockers (propranolol, nadolol, carvedilol) reduce portal pressure and are used for management of portal hypertension complications and primary prophylaxis against variceal hemorrhage.",
+    "wrong": {
+      "A": "PPIs do not reduce portal pressure or variceal bleeding risk.",
+      "B": "Loop diuretics manage ascites/edema, not variceal bleeding prophylaxis.",
+      "C": "Aldosterone antagonists manage ascites, not variceal bleeding prophylaxis.",
+      "D": "Bile acid sequestrants manage pruritus, not variceal bleeding risk."
+    }
+  },
+  {
+    "num": 37,
+    "category": "Variceal Hemorrhage",
+    "bloom": "Understand",
+    "task": "Pathophysiology",
+    "source": "Lecture 2",
+    "stem": "A 65-year-old man with cirrhosis develops active esophageal variceal hemorrhage. Which of the following best describes the underlying pathophysiologic mechanism responsible for the development of these varices?",
+    "choices": {
+      "A": "Direct viral invasion of the esophageal mucosa",
+      "B": "Autoimmune destruction of esophageal submucosal veins",
+      "C": "Chronic acid reflux damaging esophageal veins",
+      "D": "Increased resistance to portal blood flow causing enlargement of distal esophageal collateral veins",
+      "E": "Eosinophilic infiltration of the esophageal wall"
+    },
+    "correct": "D",
+    "rationale": "Cirrhosis causes increased resistance to portal blood flow, leading to portal hypertension and enlargement of distal esophageal collateral veins (varices), which carry a risk of rupture.",
+    "wrong": {
+      "A": "Viral invasion is not the mechanism of variceal formation.",
+      "B": "Autoimmune destruction is not the mechanism of variceal formation.",
+      "C": "Acid reflux is unrelated to variceal formation; that is a GERD mechanism.",
+      "E": "Eosinophilic infiltration describes EoE, unrelated to varices."
+    }
+  },
+  {
+    "num": 38,
+    "category": "Hepatocellular Carcinoma",
+    "bloom": "Apply",
+    "task": "Pharmacotherapy / safety screening",
+    "source": "Lecture 5",
+    "stem": "A patient with cirrhosis and confirmed hepatocellular carcinoma is scheduled to begin first-line systemic therapy with atezolizumab plus bevacizumab. Prior to initiating this regimen, which of the following must be screened for due to increased bleeding risk?",
+    "choices": {
+      "A": "Peptic ulcer disease",
+      "B": "Esophageal varices",
+      "C": "Colonic polyps",
+      "D": "Diverticulosis",
+      "E": "Internal hemorrhoids"
+    },
+    "correct": "B",
+    "rationale": "Atezolizumab plus bevacizumab carries an increased bleeding risk, so esophageal varices must be screened for before starting this regimen.",
+    "wrong": {
+      "A": "PUD screening was not identified as the specific pre-treatment requirement for this regimen in this course.",
+      "C": "Colonic polyps were not identified as the specific concern.",
+      "D": "Diverticulosis was not identified as the specific concern.",
+      "E": "Hemorrhoids were not identified as the specific concern."
+    }
+  },
+  {
+    "num": 39,
+    "category": "Cholelithiasis",
+    "bloom": "Apply",
+    "task": "Management",
+    "source": "Lecture 5",
+    "stem": "A 45-year-old woman is found to have asymptomatic gallstones on imaging performed for an unrelated reason. She has no history of biliary colic or other symptoms. Which of the following is the most appropriate management?",
+    "choices": {
+      "A": "Immediate cholecystectomy",
+      "B": "Emergent ERCP",
+      "C": "Monitoring without intervention",
+      "D": "Empiric antibiotic therapy",
+      "E": "Scheduled percutaneous cholecystostomy"
+    },
+    "correct": "C",
+    "rationale": "Asymptomatic gallstones found incidentally are typically monitored without intervention; cholecystectomy is reserved for patients with typical biliary colic symptoms.",
+    "wrong": {
+      "A": "Cholecystectomy is reserved for symptomatic patients (typical biliary colic), not incidentally found asymptomatic gallstones.",
+      "B": "ERCP is not indicated without evidence of ductal obstruction or complication.",
+      "D": "Antibiotics are not indicated without evidence of infection.",
+      "E": "Percutaneous cholecystostomy is a drainage procedure for cholecystitis in high-risk surgical patients, not indicated for asymptomatic gallstones."
+    }
+  },
+  {
+    "num": 40,
+    "category": "Cholecystitis",
+    "bloom": "Apply",
+    "task": "Management",
+    "source": "Lecture 5",
+    "stem": "A 68-year-old man with multiple comorbidities is diagnosed with acute cholecystitis but is considered too high-risk for surgery. Which of the following is the most appropriate management approach?",
+    "choices": {
+      "A": "Percutaneous cholecystostomy tube for gallbladder drainage",
+      "B": "Immediate laparoscopic cholecystectomy regardless of surgical risk",
+      "C": "Oral antibiotics alone without any drainage or surgical procedure",
+      "D": "ERCP to drain the gallbladder directly",
+      "E": "Observation without antibiotics or drainage"
+    },
+    "correct": "A",
+    "rationale": "In high surgical risk patients with acute cholecystitis, percutaneous cholecystostomy provides gallbladder drainage as an alternative to immediate cholecystectomy.",
+    "wrong": {
+      "B": "Immediate surgery is not appropriate given the patient's high surgical risk.",
+      "C": "Antibiotics alone without drainage are insufficient for high-risk patients with acute cholecystitis.",
+      "D": "ERCP accesses the biliary tree/pancreatic duct, not the gallbladder directly, and is not the described drainage method for cholecystitis.",
+      "E": "Observation without treatment risks progression to perforation/sepsis."
+    }
+  },
+  {
+    "num": 41,
+    "category": "Choledocholithiasis",
+    "bloom": "Apply",
+    "task": "Management",
+    "source": "Lecture 5",
+    "stem": "A 55-year-old woman with confirmed choledocholithiasis undergoes successful ERCP with stone extraction. Which of the following additional procedures may also be considered as part of her overall management?",
+    "choices": {
+      "A": "Liver transplantation",
+      "B": "TIPS placement",
+      "C": "Radiofrequency ablation",
+      "D": "Cholecystectomy",
+      "E": "Whipple procedure"
+    },
+    "correct": "D",
+    "rationale": "Along with ERCP for stone extraction, cholecystectomy can be considered as part of the overall management of choledocholithiasis to prevent recurrent gallstone-related complications.",
+    "wrong": {
+      "A": "Liver transplant is not indicated for choledocholithiasis.",
+      "B": "TIPS treats portal hypertension complications, unrelated to choledocholithiasis.",
+      "C": "Radiofrequency ablation is used for liver tumors, unrelated to choledocholithiasis.",
+      "E": "Whipple procedure is a pancreatic/duodenal cancer surgery, not indicated for choledocholithiasis."
+    }
+  },
+  {
+    "num": 42,
+    "category": "Ascending Cholangitis",
+    "bloom": "Analyze",
+    "task": "Diagnostic / therapeutic selection",
+    "source": "Lecture 5",
+    "stem": "A 70-year-old man presents with Reynolds pentad. After fluid resuscitation and initiation of IV antibiotics, which of the following represents the gold standard diagnostic and definitive therapeutic procedure for this condition?",
+    "choices": {
+      "A": "Abdominal ultrasound",
+      "B": "CT abdomen with contrast",
+      "C": "MRCP",
+      "D": "ERCP with cholangiography",
+      "E": "HIDA scan"
+    },
+    "correct": "D",
+    "rationale": "Cholangiography via ERCP is the gold standard, providing both diagnosis and therapeutic endoscopic sphincterotomy with stone extraction and/or stent placement for biliary drainage.",
+    "wrong": {
+      "A": "Ultrasound is the initial test of choice but is not the gold standard/definitive procedure.",
+      "B": "CT may be considered if ultrasound is inconclusive but is not the gold standard.",
+      "C": "MRCP is a noninvasive imaging alternative but is not the gold standard therapeutic procedure.",
+      "E": "HIDA scan evaluates gallbladder function/cystic duct patency, not the gold standard for cholangitis."
+    }
+  },
+  {
+    "num": 43,
+    "category": "Hepatitis B",
+    "bloom": "Apply",
+    "task": "Pathophysiology / transmission",
+    "source": "Lecture 5",
+    "stem": "A 26-year-old woman gives birth to a healthy infant. She is found to be HBsAg positive during prenatal screening. Which of the following is the most likely route by which her infant could acquire hepatitis B infection?",
+    "choices": {
+      "A": "Fecal-oral transmission during breastfeeding",
+      "B": "Perinatal transmission during childbirth",
+      "C": "Airborne transmission in the newborn nursery",
+      "D": "Vector-borne transmission",
+      "E": "Transmission requires concurrent hepatitis D infection"
+    },
+    "correct": "B",
+    "rationale": "Hepatitis B can be transmitted percutaneously, sexually, parenterally, and perinatally during childbirth; perinatal transmission is a key route for neonatal infection.",
+    "wrong": {
+      "A": "Fecal-oral transmission is characteristic of hepatitis A/E, not B.",
+      "C": "Hepatitis B is not airborne.",
+      "D": "Hepatitis B is not vector-borne.",
+      "E": "Hepatitis D dependency does not apply to hepatitis B transmission itself."
+    }
+  },
+  {
+    "num": 44,
+    "category": "Cirrhosis",
+    "bloom": "Apply",
+    "task": "Pharmacotherapy",
+    "source": "Lecture 5",
+    "stem": "A 61-year-old man with cirrhosis develops worsening ascites, lower extremity edema, and pruritus. Which of the following medications is most appropriate to address his pruritus?",
+    "choices": {
+      "A": "Cholestyramine",
+      "B": "Spironolactone",
+      "C": "Furosemide",
+      "D": "Lactulose",
+      "E": "Rifaximin"
+    },
+    "correct": "A",
+    "rationale": "Cholestyramine, a bile acid sequestrant, is used to manage cholestasis-related pruritus in cirrhotic patients.",
+    "wrong": {
+      "B": "Spironolactone treats ascites/edema, not pruritus directly.",
+      "C": "Furosemide treats ascites/edema, not pruritus directly.",
+      "D": "Lactulose treats hepatic encephalopathy, not pruritus.",
+      "E": "Rifaximin treats hepatic encephalopathy, not pruritus."
+    }
+  },
+  {
+    "num": 45,
+    "category": "Portal Hypertension",
+    "bloom": "Apply",
+    "task": "Management",
+    "source": "Lecture 5",
+    "stem": "A 59-year-old man with cirrhosis and refractory ascites, despite maximal diuretic therapy and dietary sodium restriction, continues to require frequent large-volume paracentesis. Which of the following is the most appropriate next step to reduce portal pressure and decrease the frequency of paracentesis?",
+    "choices": {
+      "A": "Increase sodium intake",
+      "B": "Discontinue beta-blocker therapy",
+      "C": "TIPS (transjugular intrahepatic portosystemic shunt)",
+      "D": "Start N-acetylcysteine",
+      "E": "Begin pegylated interferon"
+    },
+    "correct": "C",
+    "rationale": "TIPS creates a shunt between the portal and systemic venous circulation to relieve portal pressure, used for complications such as refractory ascites or recurrent variceal bleeding when medical management is insufficient.",
+    "wrong": {
+      "A": "Increasing sodium intake would worsen ascites, not help.",
+      "B": "Discontinuing beta-blocker therapy does not address refractory ascites.",
+      "D": "NAC treats acetaminophen toxicity, unrelated to refractory ascites.",
+      "E": "Pegylated interferon treats hepatitis D, unrelated to refractory ascites."
+    }
+  },
+  {
+    "num": 46,
+    "category": "Hepatocellular Carcinoma",
+    "bloom": "Apply",
+    "task": "Diagnostic interpretation",
+    "source": "Lecture 5",
+    "stem": "Which imaging finding is characteristic of hepatocellular carcinoma on contrast-enhanced CT or MRI?",
+    "choices": {
+      "A": "Arterial enhancement with venous washout",
+      "B": "Uniform hypoenhancement throughout all contrast phases",
+      "C": "Peripheral rim enhancement with delayed central fill-in",
+      "D": "Complete absence of enhancement in all phases",
+      "E": "Echogenic foci with posterior acoustic shadowing"
+    },
+    "correct": "A",
+    "rationale": "HCC characteristically shows arterial phase enhancement with washout on the venous/delayed phase on contrast-enhanced CT or MRI.",
+    "wrong": {
+      "B": "Uniform hypoenhancement is not the characteristic HCC pattern described in this course.",
+      "C": "Peripheral rim enhancement with delayed fill-in is a pattern associated with hemangiomas, not the HCC pattern taught here.",
+      "D": "Complete absence of enhancement is not consistent with a vascular malignancy such as HCC.",
+      "E": "Echogenic foci with posterior shadowing describes gallstones on ultrasound, not an HCC imaging pattern."
+    }
+  },
+  {
+    "num": 47,
+    "category": "Cholecystitis",
+    "bloom": "Remember",
+    "task": "Pathophysiology / microbiology",
+    "source": "Lecture 5",
+    "stem": "Which of the following organisms is the most common cause of the infectious component of acute cholecystitis?",
+    "choices": {
+      "A": "Staphylococcus aureus",
+      "B": "Streptococcus pyogenes",
+      "C": "Escherichia coli",
+      "D": "Pseudomonas aeruginosa",
+      "E": "Bacteroides fragilis"
+    },
+    "correct": "C",
+    "rationale": "Gram-negative enteric organisms cause the infectious component of cholecystitis, with E. coli being the most common, followed by Klebsiella and Enterobacter.",
+    "wrong": {
+      "A": "S. aureus is not identified as the most common cause in this course.",
+      "B": "S. pyogenes is not identified as the most common cause in this course.",
+      "D": "Pseudomonas is not identified as the most common cause in this course.",
+      "E": "Bacteroides is not identified as the most common cause in this course."
+    }
+  },
+  {
+    "num": 48,
+    "category": "Ascending Cholangitis",
+    "bloom": "Analyze",
+    "task": "Management (unstable patient)",
+    "source": "Lecture 5",
+    "stem": "A 75-year-old woman with ascending cholangitis and septic shock is deemed too unstable to tolerate ERCP. Which of the following is the most appropriate alternative intervention for biliary drainage?",
+    "choices": {
+      "A": "Observation until she is stable enough for ERCP, without any interim intervention",
+      "B": "Oral antibiotics alone",
+      "C": "Immediate open cholecystectomy",
+      "D": "Liver transplantation evaluation",
+      "E": "Percutaneous transhepatic cholangiography (PTC) or percutaneous cholecystostomy tube"
+    },
+    "correct": "E",
+    "rationale": "In patients who are unstable or cannot tolerate ERCP, or when ERCP is unsuccessful, percutaneous transhepatic cholangiography or a percutaneous cholecystostomy tube can achieve biliary drainage; open surgical decompression is reserved if these methods fail.",
+    "wrong": {
+      "A": "Observation without drainage in an unstable septic patient risks clinical deterioration; some form of source control is needed.",
+      "B": "Oral antibiotics alone are insufficient without biliary drainage in this unstable patient.",
+      "C": "Open cholecystectomy addresses the gallbladder, not the obstructed common bile duct, and is not the described alternative drainage approach for an unstable patient.",
+      "D": "Transplant evaluation is not appropriate for an acute infectious process."
+    }
+  },
+  {
+    "num": 49,
+    "category": "Cirrhosis",
+    "bloom": "Understand",
+    "task": "Management",
+    "source": "Lecture 5",
+    "stem": "Which of the following is considered the ultimate curative treatment for advanced cirrhosis, per course teaching?",
+    "choices": {
+      "A": "TIPS placement",
+      "B": "Lifelong antiviral therapy",
+      "C": "Serial paracentesis",
+      "D": "Liver transplantation",
+      "E": "Nonselective beta-blocker therapy"
+    },
+    "correct": "D",
+    "rationale": "Per course teaching, liver transplantation is the ultimate cure for cirrhosis; other interventions manage complications but do not reverse the underlying disease.",
+    "wrong": {
+      "A": "TIPS relieves portal pressure and manages complications but does not cure the underlying cirrhosis.",
+      "B": "Antiviral therapy may treat an underlying viral cause but does not reverse established cirrhosis.",
+      "C": "Paracentesis manages ascites symptomatically but is not curative.",
+      "E": "Beta-blockers reduce variceal bleeding risk but do not cure cirrhosis."
+    }
+  },
+  {
+    "num": 50,
+    "category": "Ascending Cholangitis",
+    "bloom": "Remember",
+    "task": "Pathophysiology / microbiology",
+    "source": "Lecture 5",
+    "stem": "Which organisms are most commonly responsible for the infectious process in ascending cholangitis?",
+    "choices": {
+      "A": "Gram-negative organisms such as E. coli and Klebsiella",
+      "B": "Gram-positive cocci such as Staphylococcus aureus",
+      "C": "Anaerobic organisms exclusively",
+      "D": "Fungal organisms such as Candida",
+      "E": "Viral pathogens"
+    },
+    "correct": "A",
+    "rationale": "Ascending cholangitis is most commonly caused by gram-negative organisms, particularly E. coli and Klebsiella, related to obstruction of the common bile duct.",
+    "wrong": {
+      "B": "Gram-positive cocci are not identified as the most common cause in this course.",
+      "C": "Anaerobic organisms alone are not identified as the most common cause.",
+      "D": "Fungal organisms are not identified as the most common cause.",
+      "E": "Viral pathogens are not the mechanism of ascending cholangitis, which is a bacterial infectious/obstructive process."
+    }
+  }
+]
+</script>
+
+<script>
+const DATA = JSON.parse(document.getElementById('examData').textContent);
+const state = {}; // num -> {selected, submitted, struck:Set}
+
+function el(tag, cls, html){
+  const e = document.createElement(tag);
+  if(cls) e.className = cls;
+  if(html !== undefined) e.innerHTML = html;
+  return e;
+}
+
+function buildJumpNav(){
+  const nav = document.getElementById('jumpnav');
+  DATA.forEach(q=>{
+    const a = el('a', '', q.num);
+    a.href = '#q' + q.num;
+    a.id = 'jump' + q.num;
+    nav.appendChild(a);
+  });
+}
+
+function renderQuestion(q){
+  const card = el('div', 'qcard');
+  card.id = 'q' + q.num;
+
+  const meta = el('div', 'qmeta');
+  meta.appendChild(el('span','badge cat', q.category));
+  meta.appendChild(el('span','badge', q.bloom + ' · ' + q.task));
+  card.appendChild(meta);
+
+  const stem = el('div','stem');
+  stem.innerHTML = '<span class="qnum">Q' + q.num + '.</span> ' + q.stem;
+  card.appendChild(stem);
+
+  const lettersOrder = ['A','B','C','D','E'];
+  lettersOrder.forEach(L=>{
+    const row = el('label','choice');
+    row.id = 'q'+q.num+'_choice_'+L;
+    const radio = document.createElement('input');
+    radio.type = 'radio';
+    radio.name = 'q'+q.num;
+    radio.value = L;
+    radio.onchange = ()=>selectChoice(q.num, L);
+    row.appendChild(radio);
+    row.appendChild(el('span','letter', L + '.'));
+    row.appendChild(el('span','ctext', q.choices[L]));
+    const strikeBtn = el('button','strike-btn','⌀');
+    strikeBtn.type='button';
+    strikeBtn.title='Cross out this choice';
+    strikeBtn.onclick = (ev)=>{ ev.preventDefault(); ev.stopPropagation(); toggleStrike(q.num, L); };
+    row.appendChild(strikeBtn);
+    card.appendChild(row);
+  });
+
+  const actions = el('div','qactions');
+  const checkBtn = el('button','btn-check','Check Answer');
+  checkBtn.id = 'check'+q.num;
+  checkBtn.disabled = true;
+  checkBtn.onclick = ()=>submitAnswer(q.num);
+  actions.appendChild(checkBtn);
+  const flag = el('span','result-flag');
+  flag.id = 'flag'+q.num;
+  actions.appendChild(flag);
+  card.appendChild(actions);
+
+  const fb = el('div','feedback');
+  fb.id = 'fb'+q.num;
+  let fbHtml = '<h4>Correct answer: ' + q.correct + '</h4>';
+  fbHtml += '<div class="rationale">' + q.rationale + '</div>';
+  fbHtml += '<h4>Why the other options are incorrect</h4>';
+  lettersOrder.filter(L=>L!==q.correct).forEach(L=>{
+    fbHtml += '<div class="wrong-explain"><b>' + L + '.</b> ' + q.wrong[L] + '</div>';
+  });
+  fbHtml += '<div class="metarow">' +
+    '<span><b>Blueprint category:</b> ' + q.category + '</span>' +
+    '<span><b>Bloom level:</b> ' + q.bloom + '</span>' +
+    '<span><b>Task tested:</b> ' + q.task + '</span>' +
+    '<span><b>Source:</b> ' + q.source + '</span>' +
+    '</div>';
+  fb.innerHTML = fbHtml;
+  card.appendChild(fb);
+
+  return card;
+}
+
+function selectChoice(num, letter){
+  state[num] = state[num] || {selected:null, submitted:false, struck:new Set()};
+  state[num].selected = letter;
+  document.getElementById('check'+num).disabled = false;
+  ['A','B','C','D','E'].forEach(L=>{
+    document.getElementById('q'+num+'_choice_'+L).classList.toggle('selected', L===letter);
+  });
+  updateStats();
+}
+
+function toggleStrike(num, letter){
+  state[num] = state[num] || {selected:null, submitted:false, struck:new Set()};
+  const s = state[num].struck;
+  const rowEl = document.getElementById('q'+num+'_choice_'+letter);
+  if(s.has(letter)){ s.delete(letter); rowEl.classList.remove('struck'); }
+  else { s.add(letter); rowEl.classList.add('struck'); }
+}
+
+function submitAnswer(num){
+  const q = DATA.find(x=>x.num===num);
+  const st = state[num];
+  if(!st || !st.selected) return;
+  st.submitted = true;
+  const isCorrect = st.selected === q.correct;
+  ['A','B','C','D','E'].forEach(L=>{
+    const rowEl = document.getElementById('q'+num+'_choice_'+L);
+    if(L === q.correct) rowEl.classList.add('correct-reveal');
+    else if(L === st.selected) rowEl.classList.add('wrong-reveal');
+    rowEl.querySelector('input').disabled = true;
+    rowEl.querySelector('.strike-btn').disabled = true;
+  });
+  const flag = document.getElementById('flag'+num);
+  flag.textContent = isCorrect ? 'Correct' : 'Incorrect';
+  flag.className = 'result-flag ' + (isCorrect ? 'correct':'incorrect');
+  document.getElementById('fb'+num).classList.add('show');
+  document.getElementById('check'+num).disabled = true;
+  const jump = document.getElementById('jump'+num);
+  jump.classList.add(isCorrect ? 'answered' : 'wronged');
+  updateStats();
+}
+
+function updateStats(){
+  const answered = Object.values(state).filter(s=>s.selected).length;
+  document.getElementById('statsLine').textContent = answered + ' / 50 answered';
+}
+
+function submitFullExam(){
+  // auto-check any answered-but-not-submitted, then show summary
+  DATA.forEach(q=>{
+    const st = state[q.num];
+    if(st && st.selected && !st.submitted){
+      submitAnswer(q.num);
+    }
+  });
+  const submittedCount = Object.values(state).filter(s=>s.submitted).length;
+  const correctCount = DATA.filter(q=>{
+    const st = state[q.num];
+    return st && st.submitted && st.selected === q.correct;
+  }).length;
+
+  const catStats = {};
+  DATA.forEach(q=>{
+    catStats[q.category] = catStats[q.category] || {total:0, correct:0, answered:0};
+    catStats[q.category].total++;
+    const st = state[q.num];
+    if(st && st.submitted){
+      catStats[q.category].answered++;
+      if(st.selected === q.correct) catStats[q.category].correct++;
+    }
+  });
+
+  const box = document.getElementById('summaryBox');
+  box.classList.add('show');
+  const pct = submittedCount ? Math.round(100*correctCount/submittedCount) : 0;
+  document.getElementById('summaryScore').innerHTML =
+    '<div style="font-size:1.6rem; font-weight:700;">' + correctCount + ' / ' + submittedCount + ' correct (' + pct + '%)</div>' +
+    '<div style="font-size:0.85rem; opacity:0.85;">' + (50-submittedCount) + ' question(s) left unanswered</div>';
+  document.getElementById('scorebarFill').style.width = pct + '%';
+
+  let tbl = '<tr><th>Blueprint Category</th><th>Correct</th><th>Answered</th><th>Total</th></tr>';
+  Object.keys(catStats).forEach(cat=>{
+    const c = catStats[cat];
+    tbl += '<tr><td>'+cat+'</td><td>'+c.correct+'</td><td>'+c.answered+'</td><td>'+c.total+'</td></tr>';
+  });
+  document.getElementById('summaryTable').innerHTML = tbl;
+  box.scrollIntoView({behavior:'smooth'});
+}
+
+document.getElementById('btnSubmitExam').onclick = submitFullExam;
+
+function init(){
+  buildJumpNav();
+  const container = document.getElementById('examContainer');
+  DATA.forEach(q=>{
+    container.appendChild(renderQuestion(q));
+  });
+  updateStats();
+}
+init();
+</script>
+
+</body>
+</html>
